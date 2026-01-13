@@ -1,0 +1,5 @@
+<div class="app-container">
+  <app-header *ngIf="!isLoginPage"></app-header>
+  <app-color-picker *ngIf="!isLoginPage"></app-color-picker>
+  <router-outlet></router-outlet>
+</div>

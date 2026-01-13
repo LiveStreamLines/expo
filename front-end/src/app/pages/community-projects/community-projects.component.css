@@ -1,0 +1,394 @@
+.overlay-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.overlay-backdrop.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.overlay-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 85%;
+  height: 100%;
+  z-index: 1001;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 0;
+}
+
+.overlay-panel.open {
+  pointer-events: auto;
+}
+
+.overlay-content-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(10px);
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+  overflow: visible;
+}
+
+.overlay-content-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(225deg, var(--gradient-start) 0%, var(--gradient-end) 25%);
+  opacity: 0.6;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.overlay-panel.open .overlay-content-wrapper {
+  transform: translateX(0);
+}
+
+.close-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #ffffff;
+  border: none;
+  cursor: pointer;
+  color: #121926;
+  font-size: 14px;
+  font-weight: 400;
+  padding: 0 16px;
+  height: 32px;
+  border-radius: 999px;
+  transition: all 0.3s ease;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.5;
+  align-self: flex-start;
+}
+
+.close-btn:hover {
+  background: #f5f5f5;
+}
+
+.close-icon {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+
+.close-text {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.overlay-content {
+  flex: 1;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: visible;
+  background: transparent;
+  min-height: 0;
+  position: relative;
+}
+
+/* Override projects grid to show 3 cards per row */
+.overlay-content ::ng-deep .projects-grid {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* Ensure proper spacing for 3 columns */
+.overlay-content ::ng-deep .projects-page {
+  padding: 0;
+  background: transparent;
+  min-height: auto;
+}
+
+/* Update page header styling */
+.overlay-content ::ng-deep .page-header {
+  margin-bottom: 17px;
+  align-items: flex-start;
+  min-height: 60px;
+}
+
+/* Update breadcrumb styling */
+.overlay-content ::ng-deep .breadcrumb {
+  font-size: 20px;
+  line-height: 1.5;
+  gap: 8px;
+  min-height: 60px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  padding-top: 4px;
+}
+
+.overlay-content ::ng-deep .breadcrumb-item {
+  color: #202939;
+  font-weight: 400;
+}
+
+.overlay-content ::ng-deep .breadcrumb-item.active {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.overlay-content ::ng-deep .breadcrumb-separator {
+  color: #9aa4b2;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1px;
+  height: 20px;
+  background: #9aa4b2;
+  border: none;
+  padding: 0;
+}
+
+/* Update view toggle styling */
+.overlay-content ::ng-deep .view-toggle {
+  gap: 0;
+  border: 1px solid #9aa4b2;
+  border-radius: 999px;
+  overflow: hidden;
+  display: flex;
+}
+
+.overlay-content ::ng-deep .view-btn {
+  border-radius: 0;
+  border: none;
+  border-right: 1px solid #9aa4b2;
+  margin: 0;
+  padding: 4px 16px;
+  height: 32px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.overlay-content ::ng-deep .view-btn:last-child {
+  border-right: none;
+}
+
+.overlay-content ::ng-deep .view-btn.active {
+  background: var(--primary-color);
+  color: #ffffff;
+  border-color: var(--primary-color);
+}
+
+.overlay-content ::ng-deep .view-btn:not(.active) {
+  background: #ffffff;
+  color: #4b5565;
+  border-color: #9aa4b2;
+}
+
+/* Update project card styling */
+.overlay-content ::ng-deep .project-card {
+  border: 2px solid #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  height: 320px;
+  background: linear-gradient(225deg, var(--gradient-start) 0%, var(--gradient-end) 25%);
+  box-shadow: 6px 6px 54px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.overlay-content ::ng-deep .project-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 8px 8px 60px rgba(0, 0, 0, 0.1);
+}
+
+.overlay-content ::ng-deep .card-header {
+  padding: 0;
+  order: 1;
+  min-height: 60px;
+  max-height: 60px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.overlay-content ::ng-deep .project-name {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: #121926;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.overlay-content ::ng-deep .card-image-container {
+  order: 2;
+  height: 160px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.overlay-content ::ng-deep .card-actions {
+  order: 3;
+  padding: 8px 0 0 0;
+  border-top: none;
+  justify-content: space-between;
+  gap: 4px;
+  align-items: center;
+}
+
+.overlay-content ::ng-deep .action-btn {
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  padding: 0;
+}
+
+.overlay-content ::ng-deep .action-btn:hover {
+  background: #f6f2ff;
+  border-color: #e3e8ef;
+}
+
+.overlay-content ::ng-deep .action-btn.active {
+  background: #f6f2ff;
+  border-color: var(--primary-color);
+}
+
+.overlay-content ::ng-deep .action-icon-img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.overlay-content ::ng-deep .action-btn:hover .action-icon-img {
+  transform: scale(1.1);
+}
+
+/* Update active indicator tooltip */
+.overlay-content ::ng-deep .active-indicator {
+  background: var(--primary-color-dark);
+  padding: 8px;
+  border-radius: 10px;
+  gap: 14px;
+  margin-bottom: 3px;
+  font-size: 14px;
+  line-height: 1.5;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.overlay-content ::ng-deep .active-indicator::after {
+  border-top-color: var(--primary-color-dark);
+  border-width: 13px 7px 0 7px;
+}
+
+.overlay-content ::ng-deep .indicator-text {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* Service Tooltip Styles */
+.overlay-content ::ng-deep .service-tooltip {
+  position: absolute;
+  top: 100%;
+  margin-top: 3px;
+  z-index: 10000;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.overlay-content ::ng-deep .tooltip-arrow {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 13px solid #110038;
+  border-bottom: none;
+  z-index: 1;
+}
+
+.overlay-content ::ng-deep .tooltip-content {
+  background: #110038;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 8px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.overlay-content ::ng-deep .tooltip-text {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.overlay-content ::ng-deep .tooltip-badge {
+  background: #00b330;
+  color: #f6f2ff;
+  padding: 0 10px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 60px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.55px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.overlay-content ::ng-deep .active-badge {
+  background: #00b330;
+  color: var(--primary-color-bg);
+  padding: 0 10px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 60px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.55px;
+  text-transform: uppercase;
+}
+

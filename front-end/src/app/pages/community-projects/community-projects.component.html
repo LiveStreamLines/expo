@@ -1,0 +1,21 @@
+<div 
+  class="overlay-backdrop" 
+  [class.open]="isOpen"
+  (click)="onBackdropClick($event)">
+  <div class="overlay-panel" [class.open]="isOpen">
+    <div class="overlay-content-wrapper">
+      <button class="close-btn" (click)="onClose()">
+        <span class="close-icon">✕</span>
+        <span class="close-text">Close</span>
+      </button>
+      
+      <div class="overlay-content">
+        <app-projects 
+          [selectedCategory]="selectedCategory"
+          [developerId]="community?.id || ''">
+        </app-projects>
+      </div>
+    </div>
+  </div>
+</div>
+

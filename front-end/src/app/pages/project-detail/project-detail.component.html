@@ -1,0 +1,402 @@
+<div class="project-detail-page">
+  <!-- Project Header Banner -->
+  <div class="project-header-banner" *ngIf="project">
+    <div class="banner-image" [style.background-image]="bannerImage ? 'url(' + bannerImage + ')' : 'none'">
+      <div class="banner-overlay"></div>
+    </div>
+    <div class="banner-content">
+      <h1 class="project-title">{{ projectName }}</h1>
+      <div class="progress-section">
+        <div class="progress-info">
+          <span class="progress-days">{{ daysCompleted }} Days Completed</span>
+          <div class="progress-bar-wrapper">
+            <div class="progress-bar-line"></div>
+            <div class="progress-bar-fill" [style.width.px]="getProgressWidth()"></div>
+          </div>
+          <div class="progress-labels">
+            <span>0</span>
+            <span>{{ totalDays }}</span>
+          </div>
+        </div>
+        <div class="progress-percentage">{{ progressPercentage }}%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Return to Projects Button (above breadcrumb) -->
+  <div class="return-to-projects-section">
+    <button class="return-to-projects-btn" (click)="navigateToProjects()">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7.5 9L4.5 6L7.5 3" stroke="#9aa4b2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Back</span>
+    </button>
+  </div>
+
+  <!-- Breadcrumb (moved under banner) -->
+  <div class="breadcrumb-section">
+    <div class="breadcrumb">
+      <img *ngIf="communityImage" [src]="communityImage" [alt]="communityName" class="breadcrumb-logo clickable" (click)="navigateToCommunities()" />
+      <img *ngIf="!communityImage" src="assets/images/lsl.svg" alt="Clients" class="breadcrumb-logo clickable" (click)="navigateToCommunities()" />
+      <svg class="breadcrumb-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4.5 3L7.5 6L4.5 9" stroke="#9aa4b2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="breadcrumb-item clickable" (click)="navigateToCommunity()">{{ communityName }}</span>
+      <svg class="breadcrumb-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4.5 3L7.5 6L4.5 9" stroke="#9aa4b2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="breadcrumb-item clickable" (click)="navigateToProjects()">{{ projectName }}</span>
+    </div>
+  </div>
+
+  <!-- Tabs Section -->
+  <div class="tabs-section">
+    <div class="tab-bar">
+      <button 
+        [class.active]="activeTab === 'timelaps'"
+        (click)="setActiveTab('timelaps')"
+        class="tab-item">
+        <img src="assets/images/icons/project-actions-svg/timelapse-enable.svg" alt="Timelaps" class="tab-icon" />
+        <span>Timelaps ({{ cameras.length }})</span>
+      </button>
+      <button 
+        [class.active]="activeTab === 'live' && isServiceActive('live')"
+        [class.disabled]="!isServiceActive('live')"
+        [disabled]="!isServiceActive('live')"
+        (click)="handleTabClick('live')"
+        class="tab-item">
+        <img [src]="isServiceActive('live') ? icons.live.enable : icons.live.disable" alt="Live" class="tab-icon" />
+        <span>Live</span>
+      </button>
+      <button 
+        [class.active]="activeTab === 'satellite' && isServiceActive('satellite')"
+        [class.disabled]="!isServiceActive('satellite')"
+        [disabled]="!isServiceActive('satellite')"
+        (click)="handleTabClick('satellite')"
+        class="tab-item">
+        <img [src]="isServiceActive('satellite') ? icons.satellite.enable : icons.satellite.disable" alt="Satellite" class="tab-icon" />
+        <span>Satellite Image</span>
+      </button>
+      <button 
+        [class.active]="activeTab === 'gallery'"
+        (click)="setActiveTab('gallery')"
+        class="tab-item">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="tab-icon">
+          <path d="M2 2H6L8 4H14V14H2V2Z" stroke="#4b5565" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="7" cy="7" r="2" stroke="#4b5565" stroke-width="1.5"/>
+        </svg>
+        <span>Gallery</span>
+      </button>
+    </div>
+
+    <!-- Camera Section -->
+    <div class="camera-section">
+      <div class="camera-header">
+        <div class="camera-header-left">
+        </div>
+        <div class="view-toggle">
+          <button 
+            [class.active]="viewMode === 'list'"
+            (click)="setViewMode('list')"
+            class="view-btn">
+            <span>List</span>
+          </button>
+          <button 
+            [class.active]="viewMode === 'map'"
+            (click)="setViewMode('map')"
+            class="view-btn">
+            <span>Map</span>
+          </button>
+          <button 
+            [class.active]="viewMode === 'slideshow'"
+            (click)="setViewMode('slideshow')"
+            class="view-btn">
+            <span>Slideshow</span>
+          </button>
+        </div>
+      </div>
+      <!-- Error State -->
+      <div *ngIf="error && viewMode === 'list'" class="error-state">
+        <p>{{ error }}</p>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!error && cameras.length === 0 && viewMode === 'list'" class="empty-state">
+        <p>No cameras found for this project.</p>
+      </div>
+
+      <!-- Map View -->
+      <div class="map-view-container" *ngIf="viewMode === 'map'">
+        <div class="map-theme-selector">
+          <label for="theme-select">Map Theme:</label>
+          <select id="theme-select" [(ngModel)]="mapTheme" (change)="setMapTheme(mapTheme)" class="theme-select">
+            <option *ngFor="let themeKey of getThemeKeys()" [value]="themeKey">
+              {{ getThemeName(themeKey) }}
+            </option>
+          </select>
+        </div>
+        <div #projectMap class="project-map"></div>
+        
+        <!-- Camera Thumbnail Card Overlay -->
+        <div class="camera-thumbnail-card" *ngIf="selectedMapCamera" [style.left.px]="thumbnailCardPosition.x" [style.top.px]="thumbnailCardPosition.y">
+          <div class="camera-name-wrapper">
+            <h3 class="camera-name">
+              {{ selectedMapCamera.name }}
+              <span class="status-dot" [class.status-online]="selectedMapCamera.status === 'Online'" [class.status-offline]="selectedMapCamera.status !== 'Online'">•</span>
+            </h3>
+            <div class="camera-status-badge" [class]="'status-' + selectedMapCamera.status.toLowerCase()">
+              {{ selectedMapCamera.status }}
+            </div>
+          </div>
+          
+          <div class="camera-image-container">
+            <img 
+              *ngIf="selectedMapCamera.image"
+              [src]="selectedMapCamera.image" 
+              [alt]="selectedMapCamera.name" 
+              class="camera-image"
+              [class.no-image]="selectedMapCamera.status === 'Removed'"
+              (error)="onImageError($event, selectedMapCamera)"
+            />
+            <div class="quick-view-overlay">
+              <button class="quick-view-btn" (click)="openQuickView(selectedMapCamera, $event)">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8 3C4.5 3 1.73 5.11 0 8C1.73 10.89 4.5 13 8 13C11.5 13 14.27 10.89 16 8C14.27 5.11 11.5 3 8 3ZM8 11C6.34 11 5 9.66 5 8C5 6.34 6.34 5 8 5C9.66 5 11 6.34 11 8C11 9.66 9.66 11 8 11Z" fill="#5621d2"/>
+                </svg>
+                <span>Quick View</span>
+              </button>
+            </div>
+          </div>
+          
+          <div class="camera-details">
+            <div class="detail-item">
+              <p class="detail-label">Installed on</p>
+              <p class="detail-value">{{ selectedMapCamera.installedDate }}</p>
+            </div>
+            <div class="detail-item">
+              <p class="detail-label">Last Photo</p>
+              <p class="detail-value">{{ selectedMapCamera.lastPhotoDate }}</p>
+            </div>
+          </div>
+          
+          <button class="view-details-btn" [routerLink]="['/camera', selectedMapCamera.id]">View Details</button>
+        </div>
+      </div>
+
+      <!-- Camera Cards - Show immediately with thumbnails as they load -->
+      <div class="cameras-grid" *ngIf="!error && viewMode === 'list'">
+        <div 
+          *ngFor="let camera of cameras"
+          class="camera-card"
+          (mouseenter)="onCameraHover(camera.id)"
+          (mouseleave)="onCameraLeave()"
+          [class.hovered]="hoveredCameraId === camera.id">
+          <div class="camera-name-wrapper">
+            <h3 class="camera-name">
+              {{ camera.name }}
+              <span class="status-dot" [class.status-online]="camera.status === 'Online'" [class.status-offline]="camera.status !== 'Online'">•</span>
+            </h3>
+            <div class="camera-status-badge" [class]="'status-' + camera.status.toLowerCase()">
+              {{ camera.status }}
+            </div>
+          </div>
+          
+          <div class="camera-image-container" style="position: relative; width: 100%; height: 100%; overflow: hidden;">
+            <!-- Thumbnail first for faster loading -->
+            <img 
+              *ngIf="camera.thumbnail"
+              [src]="camera.thumbnail" 
+              [alt]="camera.name" 
+              class="camera-image"
+              [class.no-image]="camera.status === 'Removed'"
+              (load)="onImageLoad($event, camera.id)"
+              (error)="onImageError($event, camera)"
+            />
+            <!-- Full image overlay (fades in when loaded) -->
+            <img 
+              *ngIf="camera.image && camera.image !== camera.thumbnail"
+              [src]="camera.image" 
+              [alt]="camera.name" 
+              class="camera-image camera-image-full"
+              [class.no-image]="camera.status === 'Removed'"
+              (load)="onFullImageLoad($event, camera.id)"
+              (error)="onImageError($event, camera)"
+            />
+            <!-- Fallback: Use image if no thumbnail available -->
+            <img 
+              *ngIf="camera.image && !camera.thumbnail"
+              [src]="camera.image" 
+              [alt]="camera.name" 
+              class="camera-image"
+              [class.no-image]="camera.status === 'Removed'"
+              (load)="onImageLoad($event, camera.id)"
+              (error)="onImageError($event, camera)"
+            />
+            <div class="quick-view-overlay" *ngIf="hoveredCameraId === camera.id">
+              <button class="quick-view-btn" (click)="openQuickView(camera, $event)">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8 3C4.5 3 1.73 5.11 0 8C1.73 10.89 4.5 13 8 13C11.5 13 14.27 10.89 16 8C14.27 5.11 11.5 3 8 3ZM8 11C6.34 11 5 9.66 5 8C5 6.34 6.34 5 8 5C9.66 5 11 6.34 11 8C11 9.66 9.66 11 8 11Z" fill="#5621d2"/>
+                </svg>
+                <span>Quick View</span>
+              </button>
+            </div>
+          </div>
+          
+          <div class="camera-details">
+            <div class="detail-item">
+              <p class="detail-label">Installed on</p>
+              <p class="detail-value">{{ camera.installedDate }}</p>
+            </div>
+            <div class="detail-item">
+              <p class="detail-label">Last Photo</p>
+              <p class="detail-value">{{ camera.lastPhotoDate }}</p>
+            </div>
+          </div>
+          
+          <button class="view-details-btn" [routerLink]="['/camera', camera.id]">View Details</button>
+        </div>
+      </div>
+
+      <!-- Slideshow View -->
+      <div class="slideshow-view" *ngIf="viewMode === 'slideshow'">
+        <!-- Slideshow content here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick View Overlay -->
+<div 
+  class="quick-view-backdrop" 
+  [class.open]="isQuickViewOpen"
+  (click)="onQuickViewBackdropClick($event)">
+  <div class="quick-view-panel" [class.open]="isQuickViewOpen" (click)="$event.stopPropagation()">
+    <div class="quick-view-content-wrapper">
+      <div class="quick-view-header">
+        <button class="quick-view-close-btn" (click)="closeQuickView()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 4L4 12M4 4L12 12" stroke="#121926" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="close-text">Close</span>
+        </button>
+        <div class="quick-view-breadcrumb">
+          <span class="breadcrumb-community">{{ communityName }}</span>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4.5 3L7.5 6L4.5 9" stroke="#9AA4B2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="breadcrumb-project">{{ projectName }}</span>
+        </div>
+      </div>
+      
+      <div class="quick-view-content" *ngIf="quickViewCamera">
+        <div class="quick-view-camera-header">
+          <div class="camera-header-left">
+            <div class="camera-name-section">
+              <h2 class="camera-name">
+                {{ quickViewCamera.name }}
+                <span class="status-dot" [class.status-online]="quickViewCamera.status === 'Online'" [class.status-offline]="quickViewCamera.status !== 'Online'">•</span>
+              </h2>
+              <div class="status-badge" [class.status-online]="quickViewCamera.status === 'Online'" 
+                   [class.status-offline]="quickViewCamera.status === 'Offline'"
+                   [class.status-stopped]="quickViewCamera.status === 'Stopped'"
+                   [class.status-removed]="quickViewCamera.status === 'Removed'">
+                {{ quickViewCamera.status }}
+              </div>
+            </div>
+            <div class="camera-dates">
+              <div class="date-item">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="2" y="3" width="12" height="11" rx="2" stroke="#4B5565" stroke-width="1.5" fill="none"/>
+                  <path d="M5 1V4M11 1V4M2 7H14" stroke="#4B5565" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span>{{ quickViewCamera.lastPhotoDate }}</span>
+              </div>
+              <div class="date-item">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="8" cy="8" r="6" stroke="#4B5565" stroke-width="1.5" fill="none"/>
+                  <path d="M8 4V8L10 10" stroke="#4B5565" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span>{{ quickViewCamera.lastPhotoTime || '14:52:37' }}</span>
+              </div>
+            </div>
+          </div>
+          <button class="view-details-btn" [routerLink]="['/camera', quickViewCamera.id]">View Details</button>
+        </div>
+        
+        <div class="quick-view-image-section">
+          <div class="main-image-container">
+            <!-- Thumbnail first for faster loading -->
+            <img 
+              *ngIf="quickViewCamera.thumbnail"
+              [src]="quickViewCamera.thumbnail" 
+              [alt]="quickViewCamera.name" 
+              class="main-image"
+              [class.no-image]="quickViewCamera.status === 'Removed'"
+              (error)="onImageError($event, quickViewCamera)" />
+            <!-- Full image overlay (fades in when loaded) -->
+            <img 
+              *ngIf="quickViewCamera.image && quickViewCamera.image !== quickViewCamera.thumbnail"
+              [src]="quickViewCamera.image" 
+              [alt]="quickViewCamera.name" 
+              class="main-image main-image-full"
+              [class.no-image]="quickViewCamera.status === 'Removed'"
+              (error)="onImageError($event, quickViewCamera)" />
+            <!-- Fallback: Use image if no thumbnail available -->
+            <img 
+              *ngIf="quickViewCamera.image && !quickViewCamera.thumbnail"
+              [src]="quickViewCamera.image" 
+              [alt]="quickViewCamera.name" 
+              class="main-image"
+              [class.no-image]="quickViewCamera.status === 'Removed'"
+              (error)="onImageError($event, quickViewCamera)" />
+            <div class="thumbnail-overlay" *ngIf="quickViewCamera.lat && quickViewCamera.lng" (click)="openFullMap()">
+              <div #thumbnailMap class="thumbnail-map-container"></div>
+              <div class="coordinate-overlay">
+                <div class="coordinate-label">
+                  <span class="coordinate-text">{{ formatCoordinate(quickViewCamera.lat) }}, {{ formatCoordinate(quickViewCamera.lng) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="navigation-arrows">
+            <button class="nav-arrow nav-arrow-left" (click)="navigatePreviousCamera()" [disabled]="currentCameraIndex === 0">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <button class="nav-arrow nav-arrow-right" (click)="navigateNextCamera()" [disabled]="currentCameraIndex === cameras.length - 1">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Full Map Modal -->
+<div 
+  class="full-map-backdrop" 
+  [class.open]="isFullMapOpen"
+  (click)="closeFullMap($event)">
+  <div class="full-map-modal" [class.open]="isFullMapOpen" (click)="$event.stopPropagation()">
+    <div class="full-map-header">
+      <h3 *ngIf="quickViewCamera">{{ quickViewCamera.name }} - Location</h3>
+      <button class="full-map-close-btn" (click)="closeFullMap($event)">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 6L6 18M6 6L18 18" stroke="#121926" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="full-map-content">
+      <div #fullMap class="full-map-container"></div>
+      <div class="full-map-coordinates" *ngIf="quickViewCamera?.lat && quickViewCamera?.lng">
+        <span class="coordinate-label">Coordinates:</span>
+        <span class="coordinate-value">{{ formatCoordinate(quickViewCamera?.lat) }}, {{ formatCoordinate(quickViewCamera?.lng) }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,165 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 30px;
+  background: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.lsl-logo-img {
+  height: 45px;
+  width: auto;
+  object-fit: contain;
+}
+
+.header-nav {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  height: 40px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 400;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  background: #eef2f6;
+  color: #364152;
+}
+
+.nav-item:hover {
+  opacity: 0.8;
+}
+
+.nav-item.active {
+  background: #5621d2;
+  color: #ffffff;
+}
+
+.nav-icon-img {
+  width: 12px;
+  height: 12px;
+  object-fit: contain;
+}
+
+.nav-icon {
+  font-size: 1rem;
+}
+
+.nav-label {
+  font-weight: 500;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.search-btn {
+  background: #f6f2ff;
+  border: 1.5px solid #ede5ff;
+  border-radius: 999px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease;
+}
+
+.search-btn:hover {
+  opacity: 0.8;
+}
+
+.search-icon-img {
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid var(--primary-color-border);
+  transition: background 0.3s ease;
+}
+
+.user-profile:hover {
+  background: #f9f9f9;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #e5e5e5;
+  flex-shrink: 0;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 79px;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  color: #0d121c;
+  line-height: normal;
+}
+
+.user-role {
+  font-size: 12px;
+  font-weight: 400;
+  font-family: 'Inter', sans-serif;
+  color: #4b5565;
+  line-height: normal;
+}
+
+.chevron-icon {
+  width: 10px;
+  height: 6px;
+  object-fit: contain;
+  flex-shrink: 0;
+  transform: rotate(180deg);
+}
+

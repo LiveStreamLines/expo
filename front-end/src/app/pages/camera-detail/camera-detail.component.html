@@ -1,0 +1,1514 @@
+<div class="camera-detail-page">
+  <!-- Action Bar Skeleton -->
+  <div class="action-bar skeleton" *ngIf="isLoading">
+    <div class="camera-info">
+      <div class="skeleton-title"></div>
+      <div class="skeleton-badge"></div>
+    </div>
+    <div class="action-buttons">
+      <div class="skeleton-action-btn" *ngFor="let i of [1,2,3,4,5]"></div>
+    </div>
+  </div>
+
+  <!-- Action Bar -->
+  <div class="action-bar" *ngIf="!isLoading">
+    <div class="camera-info">
+      <!-- Back Button -->
+      <button class="back-button-inline" *ngIf="projectId" (click)="navigateToProject()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Back</span>
+      </button>
+      <h2 class="camera-title">
+        {{ cameraName }}
+        <span class="status-dot">•</span>
+      </h2>
+      <div class="status-badge" [class.status-online]="cameraStatus === 'Online'" 
+           [class.status-offline]="cameraStatus === 'Offline'"
+           [class.status-stopped]="cameraStatus === 'Stopped'"
+           [class.status-removed]="cameraStatus === 'Removed'">
+        {{ cameraStatus }}
+      </div>
+    </div>
+    <div class="action-buttons">
+      <button class="action-btn" (click)="openCompareModal()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 8H12M8 4V12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span>Compare</span>
+      </button>
+      <button class="action-btn" (click)="openStudioModal()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 2L10 6L14 7L10 8L8 12L6 8L2 7L6 6L8 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Studio</span>
+      </button>
+      <button class="action-btn" (click)="openVideoGenerationModal()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 4L8 2L13 4V8C13 11.314 10.314 14 7 14C3.686 14 1 11.314 1 8V4L6 2L11 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Generate Video</span>
+      </button>
+      <button class="action-btn" (click)="openPhotoGenerationModal()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="3" width="12" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M5 8L7 10L11 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Generate Image</span>
+      </button>
+      <button class="action-btn">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 4H14V12H2V4Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M6 2V6M10 2V6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span>Slideshow</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="content-wrapper">
+      <!-- Left Sidebar - Weather Info -->
+      <div class="weather-sidebar" *ngIf="!isLoading">
+        <div class="weather-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2V4M12 20V22M4 12H2M6.314 6.314L4.9 4.9M17.686 17.686L19.1 19.1M22 12H20M17.686 6.314L19.1 4.9M6.314 17.686L4.9 19.1" stroke="#FFE2A3" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="12" cy="12" r="4" stroke="#FFE2A3" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="weather-info">
+          <div class="weather-item">
+            <p class="weather-label">Humidity</p>
+            <p class="weather-value">{{ humidity }}</p>
+          </div>
+          <div class="weather-divider"></div>
+          <div class="weather-item">
+            <p class="weather-label">Temp.</p>
+            <p class="weather-value">{{ temperature }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weather Sidebar Skeleton -->
+      <div class="weather-sidebar skeleton" *ngIf="isLoading">
+        <div class="skeleton-weather-icon"></div>
+        <div class="skeleton-weather-info">
+          <div class="skeleton-weather-item"></div>
+          <div class="skeleton-weather-item"></div>
+        </div>
+      </div>
+
+      <!-- Center - Image Carousel -->
+      <div class="image-carousel-container">
+        <!-- Loading Indicator -->
+        <div *ngIf="isLoading" class="carousel-loading">
+          <div class="loading-spinner-container">
+            <div class="loading-spinner"></div>
+            <div class="loading-progress-container">
+              <div class="loading-progress-bar">
+                <div class="loading-progress-fill" [style.width.%]="loadingProgress"></div>
+              </div>
+              <p class="loading-text">{{ loadingProgress }}%</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Empty State -->
+        <div *ngIf="!isLoading && images.length === 0" class="empty-state">
+          <p>No images available</p>
+        </div>
+        
+        <!-- Images Carousel -->
+        <div *ngIf="!isLoading && images.length > 0" class="carousel-images">
+          <div *ngFor="let image of images; let i = index" 
+               class="carousel-image" 
+               [class.active]="i === currentImageIndex"
+               [class.prev]="i === currentImageIndex - 1"
+               [class.next]="i === currentImageIndex + 1">
+            <img [src]="image" [alt]="'Image ' + (i + 1)" />
+            <div class="image-timestamp-overlay" *ngIf="i === currentImageIndex && imageTimestamps[i] && image">
+              <div class="timestamp-date">{{ formatTimestampToDate(imageTimestamps[i]) }}</div>
+              <div class="timestamp-time">{{ formatTimestampToTime(imageTimestamps[i]) }}</div>
+            </div>
+          </div>
+        </div>
+        <button class="fullscreen-btn" (click)="fullscreenImage()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 2H2V5M11 2H14V5M11 14H14V11M5 14H2V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 2L6 6M14 2L10 6M14 14L10 10M2 14L6 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="carousel-navigation">
+          <button class="nav-arrow nav-prev" (click)="previousImage()" [disabled]="currentImageIndex === 0">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button class="nav-arrow nav-next" (click)="nextImage()" [disabled]="currentImageIndex === images.length - 1">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Sidebar - Actions -->
+      <div class="actions-sidebar">
+        <button class="sidebar-action-btn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 15V3M12 15L8 11M12 15L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 17L2 19C2 20.105 2.895 21 4 21L20 21C21.105 21 22 20.105 22 19L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="sidebar-action-btn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 8C18 6.939 17.578 5.922 16.828 5.172C16.078 4.422 15.061 4 14 4C13.312 4 12.644 4.167 12.05 4.48C11.456 4.793 10.955 5.243 10.586 5.793C10.217 6.343 9.992 6.976 9.93 7.636C9.868 8.296 9.97 8.964 10.228 9.58C10.486 10.196 10.892 10.743 11.414 11.172C11.936 11.601 12.56 11.9 13.23 12.045" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M18 8L14 12L10 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="sidebar-action-btn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 9V2H18V9M6 18H4C2.895 18 2 17.105 2 16V11C2 9.895 2.895 9 4 9H20C21.105 9 22 9.895 22 11V16C22 17.105 21.105 18 20 18H18M6 18V22H18V18M6 18H18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Bottom Controls -->
+    <div class="bottom-controls" *ngIf="!isLoading">
+      <div class="main-date-picker-wrapper">
+        <div class="main-date-time-picker">
+          <div class="main-date-picker-part" (click)="toggleMainDatePicker($event)">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="3" width="12" height="11" rx="2" stroke="#4b5565" stroke-width="1.5"/>
+              <path d="M5 1V4M11 1V4M2 7H14" stroke="#4b5565" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span>{{ selectedDate }}</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 6L8 10L12 6" stroke="#5621d2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <!-- Inline Calendar Dropdown (positioned above) -->
+          <div class="main-calendar-dropdown" *ngIf="showMainDatePicker" (click)="$event.stopPropagation()">
+            <input 
+              type="date" 
+              [value]="getDateInputValue()" 
+              (change)="onMainDateChange($event)"
+              class="main-calendar-input"
+            />
+          </div>
+        </div>
+        <button class="main-slider-btn" (click)="toggleThumbnailStrip($event)" [class.active]="showThumbnailStrip">
+          <span>{{ getCurrentImageTime() }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Thumbnail Strip -->
+    <div class="thumbnail-strip-container" #thumbnailStripContainer *ngIf="showThumbnailStrip" (click)="$event.stopPropagation()">
+      <button class="thumbnail-close-btn" (click)="closeThumbnailStrip()" title="Close thumbnail strip">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div *ngIf="!isLoading && images.length > 0" class="thumbnail-strip-wrapper">
+        <button class="thumbnail-nav-btn thumbnail-nav-prev" (click)="scrollThumbnails('prev')" [disabled]="thumbnailScrollLeft === 0">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="thumbnail-strip" #thumbnailStrip>
+          <div class="thumbnail-strip-content">
+            <div 
+              *ngFor="let image of images; let i = index" 
+              class="thumbnail-item"
+              [class.active]="i === currentImageIndex"
+              (click)="selectThumbnail(i); closeThumbnailStrip()">
+              <div class="thumbnail-image-wrapper">
+                <!-- Show thumbnail first for faster loading (always show thumbnail in strip) -->
+                <img 
+                  *ngIf="thumbnailImages[i]"
+                  [src]="thumbnailImages[i]" 
+                  [alt]="'Thumbnail ' + (i + 1)" 
+                  (load)="onThumbnailLoad($event, i)"
+                  style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;" />
+                <!-- Fallback to full image if thumbnail not available (shouldn't happen, but just in case) -->
+                <img 
+                  *ngIf="!thumbnailImages[i] && images[i]"
+                  [src]="images[i]" 
+                  [alt]="'Image ' + (i + 1)" 
+                  (load)="onThumbnailLoad($event, i)"
+                  style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;" />
+              </div>
+              <div class="thumbnail-timestamp" *ngIf="imageTimestamps[i]">
+                {{ formatTimestampToTime(imageTimestamps[i]) }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="thumbnail-nav-btn thumbnail-nav-next" (click)="scrollThumbnails('next')" [disabled]="thumbnailScrollLeft >= maxThumbnailScroll">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <div *ngIf="isLoading" class="thumbnail-strip-loading">
+        <p>Loading images...</p>
+      </div>
+      <div *ngIf="!isLoading && images.length === 0" class="thumbnail-strip-empty">
+        <p>No images found for this date</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Fullscreen Image Modal -->
+<div 
+  class="fullscreen-modal" 
+  *ngIf="isFullscreen && images.length > 0"
+  (click)="closeFullscreen()"
+  (keydown)="onFullscreenKeydown($event)"
+  tabindex="0">
+  <button class="fullscreen-close-btn" (click)="closeFullscreen()">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M18 6L6 18M6 6L18 18" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <div class="fullscreen-image-container" (click)="$event.stopPropagation()">
+    <img [src]="images[currentImageIndex]" [alt]="'Image ' + (currentImageIndex + 1)" class="fullscreen-image" />
+    <div class="fullscreen-timestamp" *ngIf="imageTimestamps[currentImageIndex]">
+      <div class="fullscreen-timestamp-date">{{ formatTimestampToDate(imageTimestamps[currentImageIndex]) }}</div>
+      <div class="fullscreen-timestamp-time">{{ formatTimestampToTime(imageTimestamps[currentImageIndex]) }}</div>
+    </div>
+    <div class="fullscreen-nav">
+      <button 
+        class="fullscreen-nav-btn fullscreen-nav-prev" 
+        (click)="previousImageFullscreen()" 
+        [disabled]="currentImageIndex === 0">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button 
+        class="fullscreen-nav-btn fullscreen-nav-next" 
+        (click)="nextImageFullscreen()" 
+        [disabled]="currentImageIndex === images.length - 1">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="fullscreen-counter">
+      {{ currentImageIndex + 1 }} / {{ images.length }}
+    </div>
+  </div>
+</div>
+
+<!-- Video Generation Modal -->
+<div class="video-generation-modal" *ngIf="showVideoGenerationModal" (click)="closeVideoGenerationModal($event)">
+  <div class="video-generation-modal-content" (click)="$event.stopPropagation()">
+    <!-- Close Button -->
+    <button class="video-modal-close-btn" (click)="closeVideoGenerationModal($event)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 6L6 18M6 6L18 18" stroke="#CF1D17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <!-- Modal Header -->
+    <div class="video-modal-header">
+      <h3 class="video-modal-title">Generate Video</h3>
+      <button class="video-generate-btn" (click)="generateVideo()" [disabled]="isGeneratingVideo">
+        <span *ngIf="!isGeneratingVideo">Generate Video</span>
+        <span *ngIf="isGeneratingVideo">Generating...</span>
+      </button>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div class="video-message-container" *ngIf="videoGenerationSuccess || videoGenerationError">
+      <div class="video-success-message" *ngIf="videoGenerationSuccess">
+        {{ videoGenerationSuccess }}
+      </div>
+      <div class="video-error-message" *ngIf="videoGenerationError">
+        {{ videoGenerationError }}
+      </div>
+    </div>
+
+    <!-- Date Range Section -->
+    <div class="video-date-range-section">
+      <div class="video-date-range-item">
+        <label class="video-label">From</label>
+        <div class="video-date-picker-wrapper">
+          <div class="video-date-picker-part" (click)="toggleVideoDatePicker('from', $event)">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="3" width="12" height="11" rx="2" stroke="#4b5565" stroke-width="1.5"/>
+              <path d="M5 1V4M11 1V4M2 7H14" stroke="#4b5565" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span>{{ formatDateForVideo(videoFromDate) }}</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 6L8 10L12 6" stroke="#5621d2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <!-- Inline Calendar for From Date -->
+          <div class="compare-calendar-dropdown" *ngIf="showVideoFromDatePicker" (click)="$event.stopPropagation()">
+            <input 
+              type="date" 
+              [value]="getVideoDateInputValue('from')" 
+              (change)="onVideoDateChange('from', $event)"
+              class="compare-calendar-input"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="video-date-range-item">
+        <label class="video-label">To</label>
+        <div class="video-date-picker-wrapper">
+          <div class="video-date-picker-part" (click)="toggleVideoDatePicker('to', $event)">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="3" width="12" height="11" rx="2" stroke="#4b5565" stroke-width="1.5"/>
+              <path d="M5 1V4M11 1V4M2 7H14" stroke="#4b5565" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span>{{ formatDateForVideo(videoToDate) }}</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 6L8 10L12 6" stroke="#5621d2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <!-- Inline Calendar for To Date -->
+          <div class="compare-calendar-dropdown" *ngIf="showVideoToDatePicker" (click)="$event.stopPropagation()">
+            <input 
+              type="date" 
+              [value]="getVideoDateInputValue('to')" 
+              (change)="onVideoDateChange('to', $event)"
+              class="compare-calendar-input"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Time Range Section -->
+    <div class="video-time-range-section">
+      <div class="video-time-range-item">
+        <label class="video-label">Start Hour (HH)</label>
+        <div class="video-hour-input-wrapper">
+          <input
+            type="number"
+            class="video-hour-input"
+            min="0"
+            max="23"
+            [(ngModel)]="videoFromHour"
+            name="videoFromHour"
+            (keydown)="preventManualHourInput($event)"
+          />
+          <div class="video-hour-arrows">
+            <button type="button" class="video-hour-arrow up" (click)="incrementVideoHour('from')">▲</button>
+            <button type="button" class="video-hour-arrow down" (click)="decrementVideoHour('from')">▼</button>
+          </div>
+        </div>
+      </div>
+      <div class="video-time-range-item">
+        <label class="video-label">End Hour (HH)</label>
+        <div class="video-hour-input-wrapper">
+          <input
+            type="number"
+            class="video-hour-input"
+            [min]="videoFromHour + 1"
+            max="23"
+            [(ngModel)]="videoToHour"
+            name="videoToHour"
+            (keydown)="preventManualHourInput($event)"
+          />
+          <div class="video-hour-arrows">
+            <button type="button" class="video-hour-arrow up" (click)="incrementVideoHour('to')">▲</button>
+            <button type="button" class="video-hour-arrow down" (click)="decrementVideoHour('to')">▼</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings and Preview Section -->
+    <div class="video-settings-preview-section">
+      <!-- Left Sidebar - Settings -->
+      <div class="video-settings-sidebar">
+        <!-- Resolution, Speed, and Image Size -->
+        <div class="video-settings-card">
+          <div class="video-settings-row">
+            <div class="video-setting-item">
+              <label class="video-setting-label">Resolution</label>
+              <div class="video-dropdown" (click)="toggleVideoDropdown('resolution', $event)">
+                <span>{{ videoResolution === '720' ? '720p' : videoResolution === '4K' ? '4K' : videoResolution }}</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4 6L8 10L12 6" stroke="#5621d2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="video-dropdown-menu" *ngIf="showVideoResolutionDropdown" (click)="$event.stopPropagation()">
+                  <div class="video-dropdown-item" (click)="videoResolution = '720'; showVideoResolutionDropdown = false">720p</div>
+                  <div class="video-dropdown-item" (click)="videoResolution = '4K'; showVideoResolutionDropdown = false">4K</div>
+                </div>
+              </div>
+            </div>
+            <div class="video-setting-item">
+              <label class="video-setting-label">Speed</label>
+              <div class="video-dropdown" (click)="toggleVideoDropdown('speed', $event)">
+                <span>{{ videoSpeed === 'fast' ? 'Fast' : videoSpeed === 'regular' ? 'Regular' : videoSpeed === 'slow' ? 'Slow' : videoSpeed }}</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4 6L8 10L12 6" stroke="#5621d2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="video-dropdown-menu" *ngIf="showVideoSpeedDropdown" (click)="$event.stopPropagation()">
+                  <div class="video-dropdown-item" (click)="videoSpeed = 'fast'; showVideoSpeedDropdown = false">Fast (30 fps)</div>
+                  <div class="video-dropdown-item" (click)="videoSpeed = 'regular'; showVideoSpeedDropdown = false">Regular (15 fps)</div>
+                  <div class="video-dropdown-item" (click)="videoSpeed = 'slow'; showVideoSpeedDropdown = false">Slow (5 fps)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="video-settings-row">
+            <div class="video-setting-item">
+              <label class="video-setting-label">Image Size</label>
+              <div class="video-dropdown" (click)="toggleVideoDropdown('imageSize', $event)">
+                <span>{{ imageSize === 'large' ? 'Large' : imageSize === 'optimized' ? 'Optimized' : imageSize }}</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4 6L8 10L12 6" stroke="#5621d2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="video-dropdown-menu" *ngIf="showVideoImageSizeDropdown" (click)="$event.stopPropagation()">
+                  <div class="video-dropdown-item" (click)="imageSize = 'large'; showVideoImageSizeDropdown = false">Large</div>
+                  <div class="video-dropdown-item" (click)="imageSize = 'optimized'; showVideoImageSizeDropdown = false">Optimized</div>
+                </div>
+              </div>
+            </div>
+            <div class="video-setting-item" *ngIf="estimatedVideoDuration !== null">
+              <label class="video-setting-label">Est. Duration</label>
+              <div class="video-estimated-duration">
+                <span>{{ formatEstimatedDuration(estimatedVideoDuration) }}</span>
+              </div>
+            </div>
+          </div>
+          <!-- Show Date/Time Checkboxes -->
+          <div class="video-checkboxes-row">
+            <label class="video-checkbox-label" [class.checked]="showDateInVideo">
+              <input type="checkbox" [(ngModel)]="showDateInVideo" class="video-checkbox-input">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="video-checkbox-icon">
+                <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z" [attr.fill]="showDateInVideo ? '#697586' : 'none'" stroke="#697586" stroke-width="1.5"/>
+              </svg>
+              <span>Show Date</span>
+            </label>
+            <label class="video-checkbox-label" [class.checked]="showTimeInVideo">
+              <input type="checkbox" [(ngModel)]="showTimeInVideo" class="video-checkbox-input">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="video-checkbox-icon">
+                <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z" [attr.fill]="showTimeInVideo ? '#5621d2' : 'none'" stroke="#5621d2" stroke-width="1.5"/>
+              </svg>
+              <span>Show Time</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Overlay Options -->
+        <div class="video-overlay-options">
+          <button class="video-overlay-btn" [class.active]="videoOverlayType === 'text'" (click)="videoOverlayType = 'text'">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 6H20M4 12H20M4 18H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span>Text</span>
+          </button>
+          <button class="video-overlay-btn" [class.active]="videoOverlayType === 'logo'" (click)="videoOverlayType = 'logo'">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+              <path d="M9 9L15 15M15 9L9 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span>Logo</span>
+          </button>
+          <button class="video-overlay-btn" [class.active]="videoOverlayType === 'watermark'" (click)="videoOverlayType = 'watermark'">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Watermark</span>
+          </button>
+        </div>
+
+        <!-- Text Overlay Section -->
+        <div class="video-overlay-section" *ngIf="videoOverlayType === 'text'">
+          <div class="video-overlay-header">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 5L5 10L10 15" stroke="#5621d2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <h4 class="video-overlay-title">Add Text</h4>
+          </div>
+          <div class="video-text-input-wrapper">
+            <input
+              type="text"
+              class="video-text-input"
+              [(ngModel)]="videoTextOverlay"
+              name="videoTextOverlay"
+              placeholder="Enter text to display"
+            />
+          </div>
+        </div>
+
+        <!-- Logo Overlay Section -->
+        <div class="video-overlay-section" *ngIf="videoOverlayType === 'logo'">
+          <div class="video-overlay-header">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 5L5 10L10 15" stroke="#5621d2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <h4 class="video-overlay-title">Add Logo</h4>
+          </div>
+          <div class="video-logo-upload-area" 
+               (click)="logoFileInput.click()"
+               (dragover)="onLogoDragOver($event)"
+               (drop)="onLogoDrop($event)"
+               (dragleave)="onLogoDragLeave($event)">
+            <input
+              type="file"
+              #logoFileInput
+              (change)="onLogoFileSelected($event)"
+              accept="image/*"
+              style="display: none;"
+            />
+            <div class="video-upload-drag-area" [class.has-file]="videoLogoFile">
+              <p *ngIf="!videoLogoFile" class="video-upload-text">
+                Click to browse or<br />
+                drag and drop your files
+              </p>
+              <div *ngIf="videoLogoFile" class="video-upload-file-info">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="2" y="2" width="12" height="12" rx="2" stroke="#242634" stroke-width="1.5"/>
+                  <path d="M5 5L8 8L11 5" stroke="#242634" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="video-upload-filename">{{ videoLogoFile.name }}</span>
+              </div>
+            </div>
+          </div>
+          <button class="video-overlay-done-btn" (click)="onLogoDone()">Done</button>
+        </div>
+
+        <!-- Watermark Overlay Section -->
+        <div class="video-overlay-section" *ngIf="videoOverlayType === 'watermark'">
+          <div class="video-overlay-header">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 5L5 10L10 15" stroke="#5621d2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <h4 class="video-overlay-title">Add Watermark</h4>
+          </div>
+          <div class="video-watermark-upload-area" 
+               (click)="watermarkFileInput.click()"
+               (dragover)="onWatermarkDragOver($event)"
+               (drop)="onWatermarkDrop($event)"
+               (dragleave)="onWatermarkDragLeave($event)">
+            <input
+              type="file"
+              #watermarkFileInput
+              (change)="onWatermarkFileSelected($event)"
+              accept="image/*"
+              style="display: none;"
+            />
+            <div class="video-upload-drag-area" [class.has-file]="videoWatermarkFile">
+              <p *ngIf="!videoWatermarkFile" class="video-upload-text">
+                Click to browse or<br />
+                drag and drop your files
+              </p>
+              <div *ngIf="videoWatermarkFile" class="video-upload-file-info">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="2" y="2" width="12" height="12" rx="2" stroke="#242634" stroke-width="1.5"/>
+                  <path d="M5 5L8 8L11 5" stroke="#242634" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="video-upload-filename">{{ videoWatermarkFile.name }}</span>
+                <div class="video-upload-file-size">{{ formatFileSize(videoWatermarkFile.size) }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="video-watermark-settings" *ngIf="videoWatermarkFile">
+            <div class="video-watermark-slider-item">
+              <label class="video-watermark-slider-label">Size</label>
+              <div class="video-watermark-slider-container">
+                <input 
+                  type="range" 
+                  min="0.1" 
+                  max="2" 
+                  step="0.1" 
+                  [(ngModel)]="videoWatermarkSize" 
+                  name="videoWatermarkSize"
+                  class="video-watermark-slider"
+                />
+                <div class="video-watermark-slider-track">
+                  <div class="video-watermark-slider-fill" [style.width.%]="(videoWatermarkSize / 2) * 100"></div>
+                  <div class="video-watermark-slider-thumb" [style.left.%]="(videoWatermarkSize / 2) * 100"></div>
+                </div>
+              </div>
+            </div>
+            <div class="video-watermark-slider-item">
+              <label class="video-watermark-slider-label">Transparency</label>
+              <div class="video-watermark-slider-container">
+                <input 
+                  type="range" 
+                  min="0" 
+                  max="1" 
+                  step="0.1" 
+                  [(ngModel)]="videoWatermarkTransparency" 
+                  name="videoWatermarkTransparency"
+                  class="video-watermark-slider"
+                />
+                <div class="video-watermark-slider-track">
+                  <div class="video-watermark-slider-fill" [style.width.%]="videoWatermarkTransparency * 100"></div>
+                  <div class="video-watermark-slider-thumb" [style.left.%]="videoWatermarkTransparency * 100"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="video-overlay-done-btn" (click)="onWatermarkDone()">Done</button>
+        </div>
+
+        <!-- Image Adjustments -->
+        <div class="video-settings-card">
+          <div class="video-slider-item">
+            <label class="video-slider-label">Brightness</label>
+            <div class="video-slider-container">
+              <input type="range" min="0" max="100" [(ngModel)]="videoBrightness" class="video-slider">
+              <div class="video-slider-track">
+                <div class="video-slider-fill" [style.width.%]="videoBrightness"></div>
+                <div class="video-slider-thumb" [style.left.%]="videoBrightness"></div>
+              </div>
+            </div>
+          </div>
+          <div class="video-slider-item">
+            <label class="video-slider-label">Contrast</label>
+            <div class="video-slider-container">
+              <input type="range" min="0" max="100" [(ngModel)]="videoContrast" class="video-slider">
+              <div class="video-slider-track">
+                <div class="video-slider-fill" [style.width.%]="videoContrast"></div>
+                <div class="video-slider-thumb" [style.left.%]="videoContrast"></div>
+              </div>
+            </div>
+          </div>
+          <div class="video-slider-item">
+            <label class="video-slider-label">Saturation</label>
+            <div class="video-slider-container">
+              <input type="range" min="0" max="100" [(ngModel)]="videoSaturation" class="video-slider">
+              <div class="video-slider-track">
+                <div class="video-slider-fill" [style.width.%]="videoSaturation"></div>
+                <div class="video-slider-thumb" [style.left.%]="videoSaturation"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Side - Preview -->
+      <div class="video-preview-container">
+        <div class="video-preview-placeholder">
+          <img [src]="images[currentImageIndex] || ''" [alt]="'Preview'" *ngIf="images.length > 0" />
+          <div class="video-preview-empty" *ngIf="images.length === 0">
+            <p>No preview available</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Photo Generation Modal -->
+<div class="photo-generation-modal" *ngIf="showPhotoGenerationModal" (click)="closePhotoGenerationModal($event)">
+  <div class="photo-generation-modal-content" (click)="$event.stopPropagation()">
+    <!-- Close Button -->
+    <button class="photo-modal-close-btn" (click)="closePhotoGenerationModal($event)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 6L6 18M6 6L18 18" stroke="#CF1D17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <!-- Modal Header -->
+    <div class="photo-modal-header">
+      <h3 class="photo-modal-title">Generate Photo</h3>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div *ngIf="photoGenerationSuccess" class="photo-success-message">
+      <h4>Photo Request Queued Successfully</h4>
+      <p>Date From: {{ photoFromDate }} To: {{ photoToDate }}</p>
+      <p>Hours: {{ photoHour1 }} - {{ photoHour2 }}</p>
+      <p>No. of Pictures Filtered: {{ filteredPicsCount }}</p>
+      <p>Check the gallery to download the ZIP file.</p>
+    </div>
+
+    <div *ngIf="photoGenerationError" class="photo-error-message">
+      {{ photoGenerationError }}
+    </div>
+
+    <!-- Form Section -->
+    <div *ngIf="!photoGenerationSuccess" class="photo-form-section">
+      <!-- Date Range -->
+      <div class="photo-control-group">
+        <div class="photo-group-title">Date Range</div>
+        <div class="photo-form-row">
+          <div class="photo-form-field">
+            <label for="photoStartDate">Start Date</label>
+            <input
+              type="date"
+              id="photoStartDate"
+              [(ngModel)]="photoFromDate"
+              name="photoStartDate"
+              [min]="photoFirstDate"
+              [max]="photoLastDate"
+              (change)="onPhotoStartDateChange()"
+              required
+            />
+          </div>
+          <div class="photo-form-field">
+            <label for="photoEndDate">End Date</label>
+            <input
+              type="date"
+              id="photoEndDate"
+              [(ngModel)]="photoToDate"
+              name="photoEndDate"
+              [min]="photoFromDate"
+              [max]="photoLastDate"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Time Range -->
+      <div class="photo-control-group">
+        <div class="photo-group-title">Time Range</div>
+        <div class="photo-form-row">
+          <div class="photo-form-field">
+            <label for="photoHour1">Start Hour (HH)</label>
+            <div class="photo-hour-input-wrapper">
+              <input
+                type="number"
+                id="photoHour1"
+                class="photo-hour-input"
+                min="0"
+                max="23"
+                [(ngModel)]="photoHour1"
+                name="photoHour1"
+                (keydown)="preventPhotoHourInput($event)"
+                required
+              />
+              <div class="photo-hour-arrows">
+                <button type="button" class="photo-arrow up" (click)="decrementPhotoHour('photoHour1')">▲</button>
+                <button type="button" class="photo-arrow down" (click)="incrementPhotoHour('photoHour1')">▼</button>
+              </div>
+            </div>
+          </div>
+          <div class="photo-form-field">
+            <label for="photoHour2">End Hour (HH)</label>
+            <div class="photo-hour-input-wrapper">
+              <input
+                type="number"
+                id="photoHour2"
+                class="photo-hour-input"
+                [min]="photoHour1 + 1"
+                max="23"
+                [(ngModel)]="photoHour2"
+                name="photoHour2"
+                (keydown)="preventPhotoHourInput($event)"
+                required
+              />
+              <div class="photo-hour-arrows">
+                <button type="button" class="photo-arrow up" (click)="decrementPhotoHour('photoHour2')">▲</button>
+                <button type="button" class="photo-arrow down" (click)="incrementPhotoHour('photoHour2')">▼</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Options -->
+      <div class="photo-control-group">
+        <div class="photo-group-title">Options</div>
+        <div class="photo-checkbox-group">
+          <label class="photo-checkbox-label">
+            <input type="checkbox" [(ngModel)]="showDateInPhoto" name="showDateInPhoto">
+            <span>Show Date</span>
+          </label>
+          <label class="photo-checkbox-label">
+            <input type="checkbox" [(ngModel)]="showTimeInPhoto" name="showTimeInPhoto">
+            <span>Show Time</span>
+          </label>
+        </div>
+      </div>
+
+      <button class="photo-generate-btn" (click)="generatePhoto()" [disabled]="isGeneratingPhoto">
+        <span *ngIf="!isGeneratingPhoto">Generate Photo</span>
+        <span *ngIf="isGeneratingPhoto">Generating...</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Compare Modal -->
+<div class="compare-modal" *ngIf="showCompareModal" (click)="closeCompareModal($event)">
+  <div class="compare-modal-content" (click)="$event.stopPropagation()">
+    <!-- Close Button -->
+    <button class="compare-modal-close-btn" (click)="closeCompareModal($event)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 6L6 18M6 6L18 18" stroke="#CF1D17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <!-- Modal Header -->
+    <div class="compare-modal-header">
+      <h3 class="compare-modal-title">Compare</h3>
+      <!-- Tab Bar -->
+      <div class="compare-tab-bar">
+        <button class="compare-tab" [class.active]="compareMode === 'side-by-side'" (click)="compareMode = 'side-by-side'">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="3" width="5" height="10" rx="1" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="9" y="3" width="5" height="10" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+          <span>Side by Side</span>
+        </button>
+        <button class="compare-tab" [class.active]="compareMode === 'slider'" (click)="compareMode = 'slider'">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 2V14M2 8H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <span>Slider</span>
+        </button>
+        <button class="compare-tab" [class.active]="compareMode === 'spot'" (click)="compareMode = 'spot'">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+          <span>Spot</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Compare Content -->
+    <div class="compare-content">
+      <!-- Side by Side Mode -->
+      <div class="compare-side-by-side" *ngIf="compareMode === 'side-by-side'">
+        <div class="compare-image-panel">
+          <div class="compare-image-container">
+            <img *ngIf="selectedComparisonImage1" 
+                 [src]="getCompareImageUrl(selectedComparisonImage1)" 
+                 [alt]="selectedComparisonImage1"
+                 class="compare-image" />
+            <div *ngIf="!selectedComparisonImage1 && !loadingCompareLeft" class="compare-loading">
+              <p>Loading image...</p>
+            </div>
+            <div *ngIf="loadingCompareLeft" class="compare-loading">
+              <p>Loading images...</p>
+            </div>
+          </div>
+          <div class="compare-date-picker-wrapper">
+            <div class="compare-date-time-picker">
+              <div class="compare-date-picker-part" (click)="toggleCompareDatePicker('left', $event)">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="2" y="3" width="12" height="11" rx="2" stroke="#4b5565" stroke-width="1.5"/>
+                  <path d="M5 1V4M11 1V4M2 7H14" stroke="#4b5565" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span>{{ formatDateForCompare(compareLeftDate) }}</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4 6L8 10L12 6" stroke="#5621d2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <!-- Inline Calendar for Left -->
+              <div class="compare-calendar-dropdown" *ngIf="showCompareLeftDatePicker" (click)="$event.stopPropagation()">
+                <input 
+                  type="date" 
+                  [value]="getCompareDateInputValue('left')" 
+                  (change)="onCompareDateChange('left', $event)"
+                  class="compare-calendar-input"
+                />
+              </div>
+            </div>
+            <button class="compare-slider-btn" (click)="toggleCompareLeftThumbnailStrip($event)" [class.active]="showCompareLeftThumbnailStrip">
+              <span>{{ getCompareLeftImageTime() }}</span>
+            </button>
+          </div>
+          <!-- Thumbnail Strip for Left Image -->
+          <div class="compare-thumbnail-strip" *ngIf="showCompareLeftThumbnailStrip" (click)="$event.stopPropagation()">
+            <button class="thumbnail-close-btn" (click)="closeCompareLeftThumbnailStrip()" title="Close thumbnail strip">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="thumbnail-strip-container" *ngIf="!loadingCompareLeft && compareLeftImages.length > 0">
+              <div class="thumbnail-strip">
+                <div *ngFor="let timestamp of compareLeftImages" 
+                     class="thumbnail-item"
+                     [class.selected]="selectedComparisonImage1 === timestamp"
+                     (click)="selectComparisonImage1(timestamp)"
+                     [title]="formatTimestampToTime(timestamp)">
+                  <img [src]="getCompareImageUrl(timestamp)" 
+                       [alt]="timestamp"
+                       class="thumbnail-image" />
+                  <div class="thumbnail-time-badge" *ngIf="selectedComparisonImage1 === timestamp">
+                    {{ formatTimestampToTime(timestamp) }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="loadingCompareLeft" class="thumbnail-strip-loading">
+              <p>Loading images...</p>
+            </div>
+            <div *ngIf="!loadingCompareLeft && compareLeftImages.length === 0" class="thumbnail-strip-empty">
+              <p>No images found for this date</p>
+            </div>
+          </div>
+          <div *ngIf="loadingCompareLeft" class="compare-thumbnail-loading">
+            <p>Loading images...</p>
+          </div>
+          <div *ngIf="!loadingCompareLeft && compareLeftImages.length === 0" class="compare-thumbnail-empty">
+            <p>No images found for this date</p>
+          </div>
+        </div>
+        <div class="compare-image-panel">
+          <div class="compare-image-container">
+            <img *ngIf="selectedComparisonImage2" 
+                 [src]="getCompareImageUrl(selectedComparisonImage2)" 
+                 [alt]="selectedComparisonImage2"
+                 class="compare-image" />
+            <div *ngIf="!selectedComparisonImage2 && !loadingCompareRight" class="compare-loading">
+              <p>Loading image...</p>
+            </div>
+            <div *ngIf="loadingCompareRight" class="compare-loading">
+              <p>Loading images...</p>
+            </div>
+          </div>
+          <div class="compare-date-picker-wrapper">
+            <div class="compare-date-time-picker">
+              <div class="compare-date-picker-part" (click)="toggleCompareDatePicker('right', $event)">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="2" y="3" width="12" height="11" rx="2" stroke="#4b5565" stroke-width="1.5"/>
+                  <path d="M5 1V4M11 1V4M2 7H14" stroke="#4b5565" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span>{{ formatDateForCompare(compareRightDate) }}</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4 6L8 10L12 6" stroke="#5621d2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <!-- Inline Calendar for Right -->
+              <div class="compare-calendar-dropdown" *ngIf="showCompareRightDatePicker" (click)="$event.stopPropagation()">
+                <input 
+                  type="date" 
+                  [value]="getCompareDateInputValue('right')" 
+                  (change)="onCompareDateChange('right', $event)"
+                  class="compare-calendar-input"
+                />
+              </div>
+            </div>
+            <button class="compare-slider-btn" (click)="toggleCompareRightThumbnailStrip($event)" [class.active]="showCompareRightThumbnailStrip">
+              <span>{{ getCompareRightImageTime() }}</span>
+            </button>
+          </div>
+          <!-- Thumbnail Strip for Right Image -->
+          <div class="compare-thumbnail-strip" *ngIf="showCompareRightThumbnailStrip" (click)="$event.stopPropagation()">
+            <button class="thumbnail-close-btn" (click)="closeCompareRightThumbnailStrip()" title="Close thumbnail strip">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="thumbnail-strip-container" *ngIf="!loadingCompareRight && compareRightImages.length > 0">
+              <div class="thumbnail-strip">
+                <div *ngFor="let timestamp of compareRightImages" 
+                     class="thumbnail-item"
+                     [class.selected]="selectedComparisonImage2 === timestamp"
+                     (click)="selectComparisonImage2(timestamp)"
+                     [title]="formatTimestampToTime(timestamp)">
+                  <img [src]="getCompareImageUrl(timestamp)" 
+                       [alt]="timestamp"
+                       class="thumbnail-image" />
+                  <div class="thumbnail-time-badge" *ngIf="selectedComparisonImage2 === timestamp">
+                    {{ formatTimestampToTime(timestamp) }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="loadingCompareRight" class="thumbnail-strip-loading">
+              <p>Loading images...</p>
+            </div>
+            <div *ngIf="!loadingCompareRight && compareRightImages.length === 0" class="thumbnail-strip-empty">
+              <p>No images found for this date</p>
+            </div>
+          </div>
+          <div *ngIf="loadingCompareRight" class="compare-thumbnail-loading">
+            <p>Loading images...</p>
+          </div>
+          <div *ngIf="!loadingCompareRight && compareRightImages.length === 0" class="compare-thumbnail-empty">
+            <p>No images found for this date</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slider Mode -->
+      <div *ngIf="compareMode === 'slider'" class="comparison-image-wrapper" (mousedown)="onComparisonDragStart($event)">
+        <!-- Image 2 (top layer, will be clipped) - Right image (from right date picker) -->
+        <div class="comparison-image-container image2-container" [style.clip-path]="getComparisonClipPath()">
+          <img *ngIf="selectedComparisonImage2" 
+               [src]="getCompareImageUrl(selectedComparisonImage2)" 
+               [alt]="selectedComparisonImage2"
+               class="comparison-image" />
+          <div *ngIf="!selectedComparisonImage2 && !loadingCompareRight" class="comparison-loading">
+            <p>Select an image from thumbnails</p>
+          </div>
+          <div *ngIf="loadingCompareRight" class="comparison-loading">
+            <p>Loading images...</p>
+          </div>
+        </div>
+
+        <!-- Image 1 (bottom layer) - Left image (from left date picker) -->
+        <div class="comparison-image-container image1-container">
+          <img *ngIf="selectedComparisonImage1" 
+               [src]="getCompareImageUrl(selectedComparisonImage1)" 
+               [alt]="selectedComparisonImage1"
+               class="comparison-image" />
+          <div *ngIf="!selectedComparisonImage1 && !loadingCompareLeft" class="comparison-loading">
+            <p>Select an image from thumbnails</p>
+          </div>
+          <div *ngIf="loadingCompareLeft" class="comparison-loading">
+            <p>Loading images...</p>
+          </div>
+        </div>
+
+        <!-- Slider Line Indicator -->
+        <div class="comparison-slider-line" [style.left.%]="comparisonSliderValue">
+          <div class="comparison-slider-handle">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 8L20 16L16 24M12 8L8 16L12 24" stroke="#5621d2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Spot Mode -->
+      <div *ngIf="compareMode === 'spot'" class="comparison-image-wrapper rectangle-mode">
+        <!-- Image 1 (base layer) -->
+        <div class="comparison-image-container image1-container">
+          <img *ngIf="selectedComparisonImage1" 
+               [src]="getCompareImageUrl(selectedComparisonImage1)" 
+               [alt]="selectedComparisonImage1"
+               class="comparison-image" />
+          <div *ngIf="!selectedComparisonImage1 && !loadingCompareLeft" class="comparison-loading">
+            <p>Select an image from thumbnails</p>
+          </div>
+          <div *ngIf="loadingCompareLeft" class="comparison-loading">
+            <p>Loading images...</p>
+          </div>
+        </div>
+
+        <!-- Image 2 (full size, will be clipped to rectangle) -->
+        <div class="comparison-image-container image2-container rectangle-image2" [style.clip-path]="getRectangleClipPath()">
+          <img *ngIf="selectedComparisonImage2" 
+               [src]="getCompareImageUrl(selectedComparisonImage2)" 
+               [alt]="selectedComparisonImage2"
+               class="comparison-image" />
+          <div *ngIf="!selectedComparisonImage2 && !loadingCompareRight" class="comparison-loading">
+            <p>Select an image from thumbnails</p>
+          </div>
+          <div *ngIf="loadingCompareRight" class="comparison-loading">
+            <p>Loading images...</p>
+          </div>
+        </div>
+
+        <!-- Rectangle Border/Handle -->
+        <div class="rectangle-overlay" 
+             [style.left.%]="rectangleX"
+             [style.top.%]="rectangleY"
+             [style.width.px]="rectangleSize"
+             [style.height.px]="rectangleSize"
+             (mousedown)="onRectangleDragStart($event)">
+          <div class="rectangle-border"></div>
+        </div>
+      </div>
+
+      <!-- Date Pickers and Thumbnail Strips for Slider and Spot modes -->
+      <div class="compare-controls-bottom" *ngIf="compareMode === 'slider' || compareMode === 'spot'">
+        <!-- Left Side (showing right date selector) -->
+        <div class="compare-controls-panel">
+          <div class="compare-date-picker-wrapper">
+            <div class="compare-date-time-picker">
+              <div class="compare-date-picker-part" (click)="toggleCompareDatePicker('right', $event)">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="2" y="3" width="12" height="11" rx="2" stroke="#4b5565" stroke-width="1.5"/>
+                  <path d="M5 1V4M11 1V4M2 7H14" stroke="#4b5565" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span>{{ formatDateForCompare(compareRightDate) }}</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4 6L8 10L12 6" stroke="#5621d2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <!-- Inline Calendar for Right -->
+              <div class="compare-calendar-dropdown" *ngIf="showCompareRightDatePicker" (click)="$event.stopPropagation()">
+                <input 
+                  type="date" 
+                  [value]="getCompareDateInputValue('right')" 
+                  (change)="onCompareDateChange('right', $event)"
+                  class="compare-calendar-input"
+                />
+              </div>
+            </div>
+            <button class="compare-slider-btn" (click)="toggleCompareRightThumbnailStrip($event)" [class.active]="showCompareRightThumbnailStrip">
+              <span>{{ getCompareRightImageTime() }}</span>
+            </button>
+          </div>
+          <!-- Thumbnail Strip for Right Image -->
+          <div class="compare-thumbnail-strip" *ngIf="showCompareRightThumbnailStrip" (click)="$event.stopPropagation()">
+            <button class="thumbnail-close-btn" (click)="closeCompareRightThumbnailStrip()" title="Close thumbnail strip">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="thumbnail-strip-container" *ngIf="!loadingCompareRight && compareRightImages.length > 0">
+              <div class="thumbnail-strip">
+                <div *ngFor="let timestamp of compareRightImages" 
+                     class="thumbnail-item"
+                     [class.selected]="selectedComparisonImage2 === timestamp"
+                     (click)="selectComparisonImage2(timestamp)"
+                     [title]="formatTimestampToTime(timestamp)">
+                  <img [src]="getCompareImageUrl(timestamp)" 
+                       [alt]="timestamp"
+                       class="thumbnail-image" />
+                  <div class="thumbnail-time-badge" *ngIf="selectedComparisonImage2 === timestamp">
+                    {{ formatTimestampToTime(timestamp) }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="loadingCompareRight" class="thumbnail-strip-loading">
+              <p>Loading images...</p>
+            </div>
+            <div *ngIf="!loadingCompareRight && compareRightImages.length === 0" class="thumbnail-strip-empty">
+              <p>No images found for this date</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Right Side (showing left date selector) -->
+        <div class="compare-controls-panel">
+          <div class="compare-date-picker-wrapper">
+            <div class="compare-date-time-picker">
+              <div class="compare-date-picker-part" (click)="toggleCompareDatePicker('left', $event)">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="2" y="3" width="12" height="11" rx="2" stroke="#4b5565" stroke-width="1.5"/>
+                  <path d="M5 1V4M11 1V4M2 7H14" stroke="#4b5565" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span>{{ formatDateForCompare(compareLeftDate) }}</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4 6L8 10L12 6" stroke="#5621d2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <!-- Inline Calendar for Left -->
+              <div class="compare-calendar-dropdown" *ngIf="showCompareLeftDatePicker" (click)="$event.stopPropagation()">
+                <input 
+                  type="date" 
+                  [value]="getCompareDateInputValue('left')" 
+                  (change)="onCompareDateChange('left', $event)"
+                  class="compare-calendar-input"
+                />
+              </div>
+            </div>
+            <button class="compare-slider-btn" (click)="toggleCompareLeftThumbnailStrip($event)" [class.active]="showCompareLeftThumbnailStrip">
+              <span>{{ getCompareLeftImageTime() }}</span>
+            </button>
+          </div>
+          <!-- Thumbnail Strip for Left Image -->
+          <div class="compare-thumbnail-strip" *ngIf="showCompareLeftThumbnailStrip" (click)="$event.stopPropagation()">
+            <button class="thumbnail-close-btn" (click)="closeCompareLeftThumbnailStrip()" title="Close thumbnail strip">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="thumbnail-strip-container" *ngIf="!loadingCompareLeft && compareLeftImages.length > 0">
+              <div class="thumbnail-strip">
+                <div *ngFor="let timestamp of compareLeftImages" 
+                     class="thumbnail-item"
+                     [class.selected]="selectedComparisonImage1 === timestamp"
+                     (click)="selectComparisonImage1(timestamp)"
+                     [title]="formatTimestampToTime(timestamp)">
+                  <img [src]="getCompareImageUrl(timestamp)" 
+                       [alt]="timestamp"
+                       class="thumbnail-image" />
+                  <div class="thumbnail-time-badge" *ngIf="selectedComparisonImage1 === timestamp">
+                    {{ formatTimestampToTime(timestamp) }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="loadingCompareLeft" class="thumbnail-strip-loading">
+              <p>Loading images...</p>
+            </div>
+            <div *ngIf="!loadingCompareLeft && compareLeftImages.length === 0" class="thumbnail-strip-empty">
+              <p>No images found for this date</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Compare Date/Time Pickers - Now using inline calendars, modals removed -->
+
+<!-- Studio Modal -->
+<div class="studio-modal" *ngIf="showStudioModal" (click)="closeStudioModal($event)">
+  <div class="studio-modal-content" (click)="$event.stopPropagation()">
+    <!-- Close Button -->
+    <button class="studio-modal-close-btn" (click)="closeStudioModal($event)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 6L6 18M6 6L18 18" stroke="#CF1D17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <!-- Modal Header -->
+    <div class="studio-modal-header">
+      <div class="studio-header-left">
+        <h3 class="studio-modal-title">Studio</h3>
+        <div class="studio-date-time-picker">
+          <div class="studio-date-picker-part" (click)="showStudioDatePicker = true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="3" width="12" height="11" rx="2" stroke="#4b5565" stroke-width="1.5"/>
+              <path d="M5 1V4M11 1V4M2 7H14" stroke="#4b5565" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span>{{ formatDateForCompare(studioDate) }}</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 6L8 10L12 6" stroke="#5621d2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="studio-time-picker-part" (click)="showStudioTimePicker = true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="8" cy="8" r="6" stroke="#4b5565" stroke-width="1.5"/>
+              <path d="M8 4V8L10 10" stroke="#4b5565" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span>{{ formatTimeForCompare(studioTime) }}</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 6L8 10L12 6" stroke="#5621d2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="studio-header-right">
+        <button class="studio-tool-btn" (click)="undoStudioAction()" title="Undo">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 8H13M8 3L3 8L8 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="studio-tool-btn" (click)="redoStudioAction()" title="Redo">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13 8H3M8 3L13 8L8 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="studio-tool-btn clear-all-btn" (click)="clearStudioAll()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 4H14M12 4V13C12 13.5304 11.7893 14.0391 11.4142 14.4142C11.0391 14.7893 10.5304 15 10 15H6C5.46957 15 4.96086 14.7893 4.58579 14.4142C4.21071 14.0391 4 13.5304 4 13V4M6 4V3C6 2.46957 6.21071 1.96086 6.58579 1.58579C6.96086 1.21071 7.46957 1 8 1C8.53043 1 9.03914 1.21071 9.41421 1.58579C9.78929 1.96086 10 2.46957 10 3V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Clear All</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Studio Content -->
+    <div class="studio-content">
+      <!-- Toolbar -->
+      <div class="studio-toolbar">
+        <button class="studio-tool-item" [class.active]="studioTool === 'text'" (click)="setStudioTool('text')">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 7H21M7 14H21M7 21H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <span>Text</span>
+        </button>
+        <button class="studio-tool-item" [class.active]="studioTool === 'box'" (click)="setStudioTool('box')">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="4" width="20" height="20" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+          <span>Box</span>
+        </button>
+        <button class="studio-tool-item" [class.active]="studioTool === 'circle'" (click)="setStudioTool('circle')">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="14" cy="14" r="10" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+          <span>Circle</span>
+        </button>
+        <button class="studio-tool-item" [class.active]="studioTool === 'arrow'" (click)="setStudioTool('arrow')">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 14L14 8L20 14M14 8V20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Arrow</span>
+        </button>
+        <button class="studio-tool-item" [class.active]="studioTool === 'image'" (click)="setStudioTool('image')">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="6" width="20" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="10" cy="12" r="2" fill="currentColor"/>
+            <path d="M4 18L8 14L14 20L20 14L24 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Image</span>
+        </button>
+        <button class="studio-tool-item" [class.active]="studioTool === 'effect'" (click)="setStudioTool('effect')">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 4V24M4 14H24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <span>Effect</span>
+        </button>
+      </div>
+
+      <!-- Canvas and Properties -->
+      <div class="studio-main-area">
+        <!-- Canvas -->
+        <div class="studio-canvas">
+          <!-- Background image -->
+          <img 
+            *ngIf="studioImage" 
+            [src]="studioImage" 
+            [alt]="'Studio image'"
+            class="studio-canvas-image" />
+          <!-- Canvas overlay for drawing -->
+          <canvas 
+            #studioCanvas
+            *ngIf="studioImage"
+            class="studio-canvas-element"
+            (mousedown)="onStudioCanvasMouseDown($event)"
+            (mousemove)="onStudioCanvasMouseMove($event)"
+            (mouseup)="onStudioCanvasMouseUp($event)"
+            (mouseleave)="isDrawing = false">
+          </canvas>
+          <div *ngIf="!studioImage" class="studio-loading">
+            <p>Loading image...</p>
+          </div>
+          
+        </div>
+
+        <!-- Properties Panel -->
+        <div class="studio-properties">
+          <div class="studio-properties-header">
+            <h4>Properties</h4>
+          </div>
+          <div class="studio-properties-content">
+            <!-- Properties will be shown here based on selected tool -->
+            <p *ngIf="!studioTool" class="studio-properties-empty">Select a tool to edit</p>
+            
+            <!-- Tool Properties -->
+            <div *ngIf="studioTool" class="studio-properties-tool">
+              <div class="property-group" *ngIf="studioTool === 'text'">
+                <div *ngIf="selectedTextIndex !== null" class="text-selected-info">
+                  <p class="text-info-label">Text Selected</p>
+                  <button class="delete-text-btn" (click)="deleteSelectedText()" title="Delete selected text">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M2 4H14M12 4V13C12 13.5304 11.7893 14.0391 11.4142 14.4142C11.0391 14.7893 10.5304 15 10 15H6C5.46957 15 4.96086 14.7893 4.58579 14.4142C4.21071 14.0391 4 13.5304 4 13V4M6 4V3C6 2.46957 6.21071 1.96086 6.58579 1.58579C6.96086 1.21071 7.46957 1 8 1C8.53043 1 9.03914 1.21071 9.41421 1.58579C9.78929 1.96086 10 2.46957 10 3V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Delete
+                  </button>
+                </div>
+                <label>Text Color:</label>
+                <input type="color" [(ngModel)]="studioTextColor" (change)="updateSelectedTextColor()" class="property-input" />
+                <label>Font Size:</label>
+                <input type="number" [(ngModel)]="studioFontSize" min="8" max="72" class="property-input" (change)="updateSelectedTextColor()" />
+                <label>Font Family:</label>
+                <select [(ngModel)]="studioFontFamily" class="property-input" (change)="updateSelectedTextColor()">
+                  <option value="Arial">Arial</option>
+                  <option value="Times New Roman">Times New Roman</option>
+                  <option value="Courier New">Courier New</option>
+                  <option value="Verdana">Verdana</option>
+                </select>
+                <p class="text-hint" *ngIf="selectedTextIndex === null">Click on the canvas to add text, or click on existing text to select and move it.</p>
+              </div>
+              
+              <div class="property-group" *ngIf="studioTool !== 'text'">
+                <label>Stroke Color:</label>
+                <input type="color" [(ngModel)]="studioStrokeColor" class="property-input" />
+                <label>Fill Color:</label>
+                <input type="color" [(ngModel)]="studioFillColor" class="property-input" />
+                <label>Stroke Width:</label>
+                <input type="number" [(ngModel)]="studioStrokeWidth" min="1" max="20" class="property-input" />
+              </div>
+            </div>
+          </div>
+          <div class="studio-actions">
+            <button class="studio-action-btn share-btn" (click)="shareStudioImage()">
+              Share
+            </button>
+            <button class="studio-action-btn download-btn" (click)="downloadStudioImage()">
+              Download
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Studio Date/Time Picker Modals -->
+<!-- Studio Date Picker -->
+<div class="date-picker-modal" *ngIf="showStudioDatePicker" (click)="showStudioDatePicker = false">
+  <div class="date-picker-modal-content" (click)="$event.stopPropagation()">
+    <div class="date-picker-modal-header">
+      <h3>Select Date</h3>
+      <button class="modal-close-btn" (click)="showStudioDatePicker = false">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="date-picker-modal-body">
+      <input 
+        type="date" 
+        [value]="getStudioDateInputValue()" 
+        (change)="onStudioDateChange($event)"
+        class="date-input-modal"
+      />
+    </div>
+    <div class="date-picker-modal-footer">
+      <button class="modal-btn modal-btn-cancel" (click)="showStudioDatePicker = false">Cancel</button>
+      <button class="modal-btn modal-btn-apply" (click)="showStudioDatePicker = false">Apply</button>
+    </div>
+  </div>
+</div>
+
+<!-- Studio Time Picker -->
+<div class="date-picker-modal" *ngIf="showStudioTimePicker" (click)="showStudioTimePicker = false">
+  <div class="date-picker-modal-content" (click)="$event.stopPropagation()">
+    <div class="date-picker-modal-header">
+      <h3>Select Time</h3>
+      <button class="modal-close-btn" (click)="showStudioTimePicker = false">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="date-picker-modal-body">
+      <input 
+        type="time" 
+        [value]="studioTime.substring(0, 5)" 
+        (change)="onStudioTimeChange($event)"
+        class="date-input-modal"
+        step="1"
+      />
+    </div>
+    <div class="date-picker-modal-footer">
+      <button class="modal-btn modal-btn-cancel" (click)="showStudioTimePicker = false">Cancel</button>
+      <button class="modal-btn modal-btn-apply" (click)="showStudioTimePicker = false">Apply</button>
+    </div>
+  </div>
+</div>
+
+<!-- Text Input Modal -->
+<div class="text-input-modal-overlay" *ngIf="showTextInputModal" (click)="closeTextInputModal()">
+  <div class="text-input-modal" (click)="$event.stopPropagation()">
+    <div class="text-input-modal-header">
+      <h3>Enter Text</h3>
+      <button class="modal-close-btn" (click)="closeTextInputModal()" aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="text-input-modal-body">
+      <input 
+        type="text" 
+        [(ngModel)]="newTextValue" 
+        placeholder="Enter your text here..."
+        class="text-input-field"
+        (keydown.enter)="confirmTextInput()"
+        (keydown.escape)="closeTextInputModal()"
+        #textInput
+        autofocus />
+    </div>
+    <div class="text-input-modal-footer">
+      <button class="text-input-btn cancel-btn" (click)="closeTextInputModal()">Cancel</button>
+      <button class="text-input-btn confirm-btn" (click)="confirmTextInput()" [disabled]="!newTextValue.trim()">OK</button>
+    </div>
+  </div>
+</div>
+
