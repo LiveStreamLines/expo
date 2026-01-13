@@ -952,7 +952,7 @@ export class ProjectDetailComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   navigateToCommunities() {
-    this.router.navigate(['/communities']);
+    this.router.navigate(['/projects']);
   }
 
   navigateToCommunity() {

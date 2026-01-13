@@ -25,10 +25,10 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
     console.log('Login component initialized');
-    // If already authenticated, redirect to communities
+    // If already authenticated, redirect to projects
     if (this.authService.isAuthenticated()) {
-      console.log('Already authenticated, redirecting to communities');
-      this.router.navigate(['/communities']);
+      console.log('Already authenticated, redirecting to projects');
+      this.router.navigate(['/projects']);
     } else {
       console.log('Not authenticated, showing login form');
     }
@@ -47,8 +47,8 @@ export class LoginComponent implements OnInit {
       next: (response) => {
         this.isLoading = false;
         if (response.authh) {
-          // Login successful, redirect to communities
-          this.router.navigate(['/communities']);
+          // Login successful, redirect to projects
+          this.router.navigate(['/projects']);
         } else {
           this.error = 'Login failed: No token received';
         }

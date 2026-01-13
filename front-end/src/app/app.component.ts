@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { HeaderComponent } from './components/header/header.component';
-import { ColorPickerComponent } from './components/color-picker/color-picker.component';
 import { AuthService } from './services/auth.service';
 import { filter } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
@@ -9,7 +8,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, ColorPickerComponent, CommonModule],
+  imports: [RouterOutlet, HeaderComponent, CommonModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

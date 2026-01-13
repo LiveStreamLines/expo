@@ -2,7 +2,7 @@
  * API Configuration
  */
 export const API_CONFIG = {
-  baseUrl: 'https://lsl-platform.com/backend',
+  baseUrl: 'https://lsl-platform.com/expo-backend',
   endpoints: {
     developers: '/api/developers',
     communities: '/api/communities',

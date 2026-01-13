@@ -1,15 +1,15 @@
-/* CSS Variables */
+/* CSS Variables - EXPO 2030 Theme */
 :root {
-  --primary-color: #5621d2;
-  --primary-color-dark: #110038;
-  --primary-color-light: #6b46c1;
-  --primary-color-bg: #f6f2ff;
-  --primary-color-border: #ede5ff;
-  --primary-color-hover: #e9d5ff;
-  --gradient-start: #a68de5;
-  --gradient-end: #f6f2ff;
-  --gradient-card-start: #e0d9ef;
-  --gradient-overlay: rgba(10, 0, 35, 0.7);
+  --primary-color: #00a859; /* EXPO 2030 Green */
+  --primary-color-dark: #007a42;
+  --primary-color-light: #00c870;
+  --primary-color-bg: #e6f5ed;
+  --primary-color-border: #b3e5cc;
+  --primary-color-hover: #ccf2dd;
+  --gradient-start: #00a859;
+  --gradient-end: #e6f5ed;
+  --gradient-card-start: #d4f0e1;
+  --gradient-overlay: rgba(0, 122, 66, 0.7);
 }
 
 /* Global Styles */

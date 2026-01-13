@@ -120,6 +120,7 @@ export class ProjectsComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       this.communityImage = COMMUNITY_IMAGES[this.selectedCategory as keyof typeof COMMUNITY_IMAGES] || COMMUNITY_IMAGES['Dubai Hills Estate'] || '';
     }
     
+    // Check if developerId is provided via query params or input (for backward compatibility)
     this.route.queryParams.subscribe(params => {
       if (params['developerId']) {
         this.developerId = params['developerId'];
@@ -128,6 +129,34 @@ export class ProjectsComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       } else if (this.developerId) {
         this.loadCommunityName();
         this.loadProjects();
+      } else {
+        // No developerId provided - automatically use the first (and only) developer
+        this.loadFirstDeveloper();
+      }
+    });
+  }
+
+  private loadFirstDeveloper() {
+    this.isLoading = true;
+    this.communitiesService.getCommunities().subscribe({
+      next: (communities) => {
+        if (communities && communities.length > 0) {
+          // Use the first developer
+          this.developerId = communities[0].id;
+          this.selectedCategory = communities[0].name;
+          this.communityImage = communities[0].image || COMMUNITY_IMAGES[this.selectedCategory as keyof typeof COMMUNITY_IMAGES] || COMMUNITY_IMAGES['Dubai Hills Estate'] || '';
+          this.loadProjects();
+        } else {
+          this.error = 'No developer found. Please contact your administrator.';
+          this.isLoading = false;
+          this.projects = [];
+        }
+      },
+      error: (err) => {
+        console.error('Error loading developers:', err);
+        this.error = 'Failed to load developer information. Please try again later.';
+        this.isLoading = false;
+        this.projects = [];
       }
     });
   }
@@ -140,6 +169,9 @@ export class ProjectsComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     if (this.developerId && !this.route.snapshot.queryParams['developerId']) {
       this.loadCommunityName();
       this.loadProjects();
+    } else if (!this.developerId && !this.route.snapshot.queryParams['developerId']) {
+      // If no developerId is set, load the first developer
+      this.loadFirstDeveloper();
     }
   }
 
@@ -415,7 +447,7 @@ export class ProjectsComponent implements OnInit, OnChanges, AfterViewInit, OnDe
   }
 
   navigateToAllProjects() {
-    this.router.navigate(['/communities']);
+    this.router.navigate(['/projects']);
   }
 
   navigateToCamera(cameraId: string, event: Event) {

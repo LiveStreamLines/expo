@@ -23,7 +23,7 @@
   gap: 16px;
 }
 
-.lsl-logo-img {
+.expo-logo-img {
   height: 45px;
   width: auto;
   object-fit: contain;
@@ -59,7 +59,7 @@
 }
 
 .nav-item.active {
-  background: #5621d2;
+  background: var(--primary-color);
   color: #ffffff;
 }
 

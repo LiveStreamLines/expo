@@ -12,15 +12,18 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { 
     path: '', 
-    redirectTo: '/communities', 
+    redirectTo: '/projects', 
     pathMatch: 'full'
   },
   { path: 'projects', component: ProjectsComponent, canActivate: [authGuard] },
   { path: 'project/:id', component: ProjectDetailComponent, canActivate: [authGuard] },
   { path: 'camera/:cameraId', component: CameraDetailComponent, canActivate: [authGuard] },
   { path: 'communities', component: CommunitiesComponent, canActivate: [authGuard] },
+  { path: 'monitor', component: ProjectsComponent, canActivate: [authGuard] }, // Placeholder - using projects for now
+  { path: 'contact', component: CommunitiesComponent, canActivate: [authGuard] }, // Placeholder - using communities for now
+  { path: 'admin', component: CommunitiesComponent, canActivate: [authGuard] }, // Placeholder - using communities for now
   { path: 'test', component: TestComponent, canActivate: [authGuard] },
   { path: 'camera-pics-s3-test', component: CameraPicsS3TestComponent, canActivate: [authGuard] },
-  { path: '**', redirectTo: '/communities' }
+  { path: '**', redirectTo: '/projects' }
 ];
 
