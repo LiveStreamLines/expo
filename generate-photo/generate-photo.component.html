@@ -1,0 +1,142 @@
+<div class="container">
+
+  <div class="content">
+
+    <!-- Left Section: Form -->
+    <div class="form-section" *ngIf="!isFilterComplete">
+      <p class="form-title">Generate Photo</p>
+
+      <form (ngSubmit)="filterImages()" class="form-container">
+        <!-- Group 1: Date Range -->
+        <div class="control-group group">
+          <div class="group-title">Date Range</div>
+          <div class="form-row">
+            <div class="form-field date">
+              <label for="startDate">Start Date</label>
+              <input
+                type="date"
+                id="startDate"
+                [(ngModel)]="startDate"
+                name="startDate"
+                [min]="firstdate"
+                [max]="lastdate"
+                (change)="onStartDateChange()"
+                required
+              />
+              <span class="calendar-icon">
+                <i class="material-icons">calendar_today</i>
+              </span>
+            </div>
+            <div class="form-field date">
+              <label for="endDate">End Date</label>
+              <input
+                type="date"
+                id="endDate"
+                [(ngModel)]="endDate"
+                name="endDate"
+                [min]="startDate"
+                [max]="lastdate"
+                required
+              />
+              <span class="calendar-icon">
+                <i class="material-icons">calendar_today</i>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Group 2: Time Range -->
+        <div class="control-group group">
+          <div class="group-title">Time Range</div>
+          <div class="form-row">
+            <div class="form-field">
+              <div class="number-input-wrapper">
+              <label for="hour1">Start Hour (HH)</label>
+              <div class="number" style="position: relative;">
+                <input
+                  type="number"
+                  id="hour1"
+                  class ="hour"
+                  min="0"
+                  max="23"
+                  [(ngModel)]="hour1"
+                  name="hour1"
+                  required
+                  (keydown)="preventManualInput($event)"
+                />
+                <div class="arrows">
+                  <button type="button" class="arrow up" (click)="decrement('hour1')">&#9650;</button>
+                  <button type="button" class="arrow down" (click)="increment('hour1')">&#9660;</button>
+                </div>
+              </div>
+              </div>
+            </div>
+            <div class="form-field">
+              <div class="number-input-wrapper">
+              <label for="hour2">End Hour (HH)</label>
+              <div class="number" style="position: relative;">
+                <input
+                  class="hour"
+                  type="number"
+                  id="hour2"
+                  [min]="hour1 + 1"
+                  max="23"
+                  [(ngModel)]="hour2"
+                  name="hour2"
+                  (keydown)="preventManualInput($event)"
+                  required
+                />
+                <div class="arrows">
+                  <button type="button" class="arrow up" (click)="decrement('hour2')">&#9650;</button>
+                  <button type="button" class="arrow down" (click)="increment('hour2')">&#9660;</button>
+                </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Group 3: Options -->
+        <div class="control-group group">
+          <div class="group-title">Options</div>
+          <div class="checkbox-group">
+            <div>
+              <input
+                type="checkbox"
+                id="showDate"
+                [(ngModel)]="showDate"
+                name="showDate"
+              />
+              <label for="showDate">Show Date</label>
+            </div>
+            <div>
+              <input
+                type="checkbox"
+                id="showTime"
+                [(ngModel)]="showTime"
+                name="showTime"
+              />
+              <label for="showTime">Show Time</label>
+            </div>
+          </div>
+        </div>
+
+        <button class="submit" type="submit" [disabled]="isLoading">Generate Photo</button>
+      </form>
+    </div>
+
+    <!-- Success Message -->
+    <div class="success-message" *ngIf="isFilterComplete">
+      <h3>Photo Request Queued Successfully</h3>
+      <p>Date From: {{ startDate }} To: {{ endDate }}</p>
+      <p>Hours: {{ hour1 }} - {{ hour2 }}</p>
+      <p>No. of Pictures Filtered: {{ filteredPicsCount }}</p>
+      <p>Check the gallery to download the ZIP file.</p>
+      <button (click)="goGallery()" style="margin-top: 10px; padding:10px; background-color: brown; color:white">Check on the Gallery</button>
+    </div>
+
+  
+
+  </div>
+
+</div>

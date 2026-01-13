@@ -1,0 +1,181 @@
+<div class="studio-container">
+    
+    <div class="toolbar">
+        <button (click)="selectTool('text')" [ngClass]="{ active: currentTool === 'text' }">
+          <mat-icon>text_fields</mat-icon>
+          <span>Text</span>
+        </button>
+        <button (click)="selectTool('rectangle')" [ngClass]="{ active: currentTool === 'rectangle' }">
+          <mat-icon>crop_square</mat-icon>
+          <span>Rectangle</span>
+        </button>
+        <button (click)="selectTool('circle')" [ngClass]="{ active: currentTool === 'circle' }">
+          <mat-icon>circle</mat-icon>
+          <span>Circle</span>
+        </button>
+        <button (click)="selectTool('arrow')" [ngClass]="{ active: currentTool === 'arrow' }">
+          <mat-icon>arrow_forward</mat-icon>
+          <span>Arrow</span>
+        </button>
+        <button (click)="addWatermark()" [ngClass]="{ active: currentTool === 'watermark'}">
+          <mat-icon>image</mat-icon>
+          <span>Add Image</span>
+        </button>
+        <input
+          #watermarkInput
+          type="file"
+          accept="image/*"
+          (change)="handleWatermarkUpload($event)"
+          style="display: none"
+        />
+        <button (click)="selectTool('effect')" [ngClass]="{ active: currentTool === 'effect' }">
+          <mat-icon>filter</mat-icon>
+          <span>Effect</span>
+        </button>
+        <button (click)="clearCanvas()" class="clear-button">
+          <mat-icon>clear</mat-icon>
+          <span>Clear</span>
+        </button>
+        <div class="canvas-actions">
+          <button (click)="processCanvas()" class="download-button">
+            <mat-icon>download</mat-icon>
+            <span>Download</span>
+          </button>
+        </div>
+    </div>
+  
+    <div class="canvas-area">
+        <!-- Loading Spinner -->
+        <div *ngIf="loadingCanvas" class="loading-overlay">
+          <div class="spinner"></div>
+          <p>Preparing your download link...</p>
+        </div>
+
+        <canvas
+            #canvas
+            (click)="onCanvasClick($event)"
+            (mousedown)="onCanvasMouseDown($event)"
+            (mousemove)="onCanvasMouseMove($event)"
+            (mouseup)="onCanvasMouseUp()">
+        </canvas>  
+        <!--Text Controller-->
+        <div *ngIf="currentTool === 'text' && fontControllerPosition"
+            class="text-controls"
+            [ngStyle]="{
+                top: fontControllerPosition.y + 'px',
+                left: fontControllerPosition.x + 'px'
+            }"
+            >
+            <label>Text:
+                <input type="text" [(ngModel)]="textValue" (input)="updateText()" />
+            </label>
+            <label>Font Size:
+                <input type="range" min="40" max="100" [(ngModel)]="fontSize" (input)="updateText()" />
+            </label>
+            <label>Color:
+                <input type="color" [(ngModel)]="fontColor" (input)="updateText()" />
+            </label>           
+            <button (click)="removeText()" class="remove-button">
+                <mat-icon>delete</mat-icon>
+              </button>
+        </div>
+
+        <!-- circle and rect controller -->
+        <div *ngIf="shapeControllerPosition && (currentTool === 'circle' || currentTool === 'rectangle')"
+            class="shape-controller"
+            [ngStyle]="{
+                top: shapeControllerPosition.y + 'px',
+                left: shapeControllerPosition.x + 'px'
+            }"
+            >
+            <label>
+              Fill:
+              <input type="color" [(ngModel)]="currentShape.fillColor" (ngModelChange)="updateShape()" />
+            </label>
+            <label>
+              Border:
+              <input type="color" [(ngModel)]="currentShape.borderColor" (ngModelChange)="updateShape()" />
+            </label>
+            <label>
+              Border Width:
+              <input type="range" min="1" max="20" [(ngModel)]="currentShape.borderWidth" (ngModelChange)="updateShape()" min="0" />
+            </label>
+            <div class="buttons-container">
+                <button (click)="deleteShape()" class="action-button delete-button">
+                <mat-icon>delete</mat-icon>
+                </button>
+                <button (click)="toggleShapeMove()" class="action-button move-button" [class.active]="currentShape.moveMode">
+                <mat-icon>open_with</mat-icon>
+                </button>
+            </div>
+        </div>
+
+        <!-- Arrow controller -->
+        <div *ngIf="shapeControllerPosition && currentShape.type === 'arrow'" 
+            class="shape-controller"
+            [ngStyle]="{ position: 'absolute', top: shapeControllerPosition.y + 'px', left: shapeControllerPosition.x + 'px' }">
+            <label>
+                color:
+            <input type="color" [(ngModel)]="currentShape.color" (ngModelChange)="updateShape()"/>
+            </label>
+            <label>
+                line width:
+                <input type="range" min="1" max="20" [(ngModel)]="currentShape.lineWidth" (ngModelChange)="updateShape()"/>
+            </label>
+            <div class="buttons-container">
+                <button (click)="deleteShape()" class="action-button delete-button">
+                <mat-icon>delete</mat-icon>
+                </button>
+                <button (click)="toggleShapeMove()" class="action-button move-button" [class.active]="currentShape.moveMode">
+                <mat-icon>open_with</mat-icon>
+                </button>
+            </div>
+        </div>          
+
+        <!-- Watermark Controller -->
+        <div *ngIf="watermarkControllerPosition && currentWatermark"
+            class="shape-controller"
+            [ngStyle]="{
+                top: watermarkControllerPosition.y + 'px',
+                left: watermarkControllerPosition.x + 'px'
+            }">
+            <label>
+                Transparency:
+                <input type="range" min="0" max="1" step="0.1" [(ngModel)]="currentWatermark.opacity" (ngModelChange)="updateWatermark()" />
+            </label>
+            <div class="buttons-container">
+                <button (click)="toggleWatermarkMove()" class="action-button move-button" [class.active]="currentWatermark.moveMode">
+                    <mat-icon>open_with</mat-icon>
+                </button>
+                <button (click)="deleteWatermark()" class="action-button delete-button">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </div>
+        </div>
+     
+    </div>
+
+    <!-- effect controller -->
+    <div 
+        *ngIf="currentTool === 'effect'" 
+        class="effects-panel" 
+        [ngStyle]="{
+            top: '200px', 
+            left: '150px'
+        }">
+        <label>
+            Brightness:
+            <input type="range" min="0" max="2" step="0.1" [(ngModel)]="brightness" (ngModelChange)="applyEffects()" />
+        </label>
+        <label>
+            Contrast:
+            <input type="range" min="0" max="2" step="0.1" [(ngModel)]="contrast" (ngModelChange)="applyEffects()" />
+        </label>
+        <label>
+            Saturation:
+            <input type="range" min="0" max="2" step="0.1" [(ngModel)]="saturation" (ngModelChange)="applyEffects()" />
+        </label>
+    </div>
+
+  </div>
+  

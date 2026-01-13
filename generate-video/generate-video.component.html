@@ -1,0 +1,333 @@
+<div class="container">
+
+  <div class="content">
+
+    <!-- Left Section: Form -->
+    <div class="form-section" *ngIf="!isFilterComplete">
+      <p class="form-title">Generate Video</p>
+
+      <form class="form-container">
+        <!-- Group 1: Date Range -->
+        <div class="control-group group">
+          <div class="group-title">Date Range</div>
+          <div class="form-row">
+            <div class="form-field date">
+              <label for="startDate">Start Date</label>
+              <input
+                type="date"
+                id="startDate"
+                [(ngModel)]="startDate"
+                name="startDate"
+                [min]="firstdate"
+                [max]="lastdate"
+                (change)="onStartDateChange()"
+                required
+              />
+              <span class="calendar-icon">
+                <i class="material-icons">calendar_today</i>
+              </span>
+            </div>
+            <div class="form-field date">
+              <label for="endDate">End Date</label>
+              <input
+                type="date"
+                id="endDate"
+                [(ngModel)]="endDate"
+                name="endDate"
+                [min]="startDate"
+                [max]="lastdate"
+                required
+              />
+              <span class="calendar-icon">
+                <i class="material-icons">calendar_today</i>
+              </span>
+            </div>
+          </div>
+        </div>
+      
+        <!-- Group 2: Time Range -->
+        <div class="control-group group">
+          <div class="group-title">Time Range</div>
+          <div class="form-row">
+            <div class="form-field">
+              <div class="number-input-wrapper">
+              <label for="hour1">Start Hour (HH)</label>
+              <div class="number" style="position: relative;">
+                <input
+                  type="number"
+                  id="hour1"
+                  class ="hour"
+                  min="0"
+                  max="23"
+                  [(ngModel)]="hour1"
+                  name="hour1"
+                  required
+                  (keydown)="preventManualInput($event)"
+                />
+                <div class="arrows">
+                  <button type="button" class="arrow up" (click)="decrement('hour1')">&#9650;</button>
+                  <button type="button" class="arrow down" (click)="increment('hour1')">&#9660;</button>
+                </div>
+              </div>
+              </div>
+            </div>
+            <div class="form-field">
+              <div class="number-input-wrapper">
+              <label for="hour2">End Hour (HH)</label>
+              <div class="number" style="position: relative;">
+                <input
+                  class="hour"
+                  type="number"
+                  id="hour2"
+                  [min]="hour1 + 1"
+                  max="23"
+                  [(ngModel)]="hour2"
+                  name="hour2"
+                  (keydown)="preventManualInput($event)"
+                  required
+                />
+                <div class="arrows">
+                  <button type="button" class="arrow up" (click)="decrement('hour2')">&#9650;</button>
+                  <button type="button" class="arrow down" (click)="increment('hour2')">&#9660;</button>
+                </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <!-- Group 3: Video Options -->
+        <div class="control-group group">
+          <div class="group-title">Video Options</div>
+          <div class="form-field video">
+            <label for="resolution">Resolution</label>
+            <select class ="video" id="resolution" [(ngModel)]="resolution" name="resolution" required>
+              <option value="720">720</option>
+              <option value="HD">HD</option>
+              <option value="4K">4K</option>
+            </select>
+          </div>
+      
+          <div class="form-field video">
+            <label for="duration">Duration</label>
+            <select class="video" id="duration" [(ngModel)]="duration" name="duration" required>
+              <option *ngFor="let option of durationOptions" [value]="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+
+        <!-- Group 4: Image and Text Options -->
+        <div class="control-group group">
+          <p class="group-title">Image and Text Options</p>
+          <!-- (Checkboxes and inputs for this group remain unchanged) -->
+          <div class="checkbox-group">
+              <!-- show date-->
+              <div>
+                <input
+                  type="checkbox"
+                  id="showDate"
+                  [(ngModel)]="showDate"
+                  name="showDate"
+                  (change)="onShowDateChange()"
+                />
+                <label for="showDate">Show Date</label>
+              </div>
+              <!-- show text-->
+              <div>
+                <input
+                  type="checkbox"
+                  id="showText"
+                  [(ngModel)]="showText"
+                  name="addText"
+                  (change)="onShowTextChange()"
+                />
+                <label for="showText">Add Text</label>
+                <div *ngIf="showText" class="form-field">
+                  <label for="textOverlay">Text</label>
+                  <input
+                    type="text"
+                    id="textOverlay"
+                    [(ngModel)]="textOverlay"
+                    (ngModelChange)="onTextOverlayChange()"
+                    name="textOverlay"
+                  />
+                </div>
+              </div>
+              
+              <!-- show logo -->
+              <div>
+                <input
+                  type="checkbox"
+                  id="showImage"
+                  [(ngModel)]="showImage"
+                  name="showImage"
+                  (change)="onShowImageChange()"
+                />
+                <label for="showImage">Add Logo</label>
+                <div *ngIf="showImage" style="margin: 10px">
+                  <label style='margin-right: 10px;' for="logoUpload">Upload Logo</label>
+                  <input type="file" id="logoUpload" (change)="onImageUpload($event)" />
+                </div>
+              </div>
+              <!-- water mark-->
+              <div>
+                <input
+                  type="checkbox"
+                  id="showWatermark"
+                  [(ngModel)]="showWatermark"
+                  name="addWatermark"
+                  (change)="onShowWatermarkChange()"
+                />
+                <label for="showWatermark">Add Watermark</label>
+                <div *ngIf="showWatermark" style="margin: 10px;">
+                  <label style="margin-right: 20px;" for="watermarkUpload">Upload Watermark Image</label>
+                  <input type="file" id="watermarkUpload" (change)="onWatermarkImageUpload($event)" />
+    
+                  <div style='margin: 10px' class="slider">
+                    <label for="watermarkSize">Size</label>
+                    <input
+                      type="range"
+                      id="watermarkSize"
+                      [(ngModel)]="watermarkSize"
+                      min="0.1"
+                      max="2"
+                      step="0.1"
+                      (input)="onWatermarkSettingsChange()"
+                    />
+                    <span>{{ watermarkSize }}</span>
+                  </div>
+    
+                  <div class="slider">
+                    <label for="watermarkTransparency">Transparency</label>
+                    <input
+                      type="range"
+                      id="watermarkTransparency"
+                      [(ngModel)]="watermarkTransparency"
+                      min="0"
+                      max="1"
+                      step="0.1"
+                      (input)="onWatermarkSettingsChange()"
+                    />
+                    <span>{{ watermarkTransparency }}</span>
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+
+        <!-- Group 5: Music Options -->
+        <div class="control-group group">
+          <div class="group-title">Music Options</div>
+          <div class="checkbox-group">
+            <div>
+              <input
+                type="checkbox"
+                id="addMusic"
+                [(ngModel)]="addMusic"
+                name="addMusic"
+              />
+              <label for="addMusic">Add Music</label>
+            </div>
+            <div *ngIf="addMusic" class="form-field music">
+              <label for="musicSelect">Select Music</label>
+              <select
+                id="musicSelect"
+                [(ngModel)]="selectedMusic"
+                (change)="onMusicSelectionChange()"
+                name="selectedMusic"
+                required
+                style="width: 50%"
+              >
+                <option *ngFor="let music of musicFiles" [value]="music">
+                  {{ music }}
+                </option>
+              </select>
+            </div>
+            <div *ngIf="addMusic && musicUrl" class="music-controls">
+              <button type="button" (click)="playMusic()">Play</button>
+              <button type="button" (click)="stopMusic()">Stop</button>
+            </div>
+          </div>
+        </div>
+
+      
+      </form>
+    </div>
+
+    <!-- Success Message -->
+    <div class="success-message" *ngIf="isFilterComplete">
+      <h3>Video Request Queued Successfully</h3>
+      <p>Date From: {{ startDate }} To: {{ endDate }}</p>
+      <p>Hours: {{ hour1 }} - {{ hour2 }}</p>
+      <p>Resolution: {{ resolution }}</p>
+      <p>Video Length: {{ duration }} seconds</p>
+      <p>No. of Pictures Filtered: {{ filteredPicsCount }}</p>
+      <p>Estimated Time to Generate: {{ (filteredPicsCount / 60).toFixed(2) }} minutes</p>
+      <p>Check on the gallery/video request to see the video.</p>
+      <button (click)="goGallery()" style="margin-top: 10px; padding:10px; background-color: brown; color:white">Check on the Gallery</button>
+    </div>
+
+    <!-- Right Section: Preview Pane -->
+    <div class="preview-section">
+      <h2>Preview</h2>
+      <canvas #canvas *ngIf="previewPHoto" class="image-preview"></canvas>
+      <p *ngIf="!previewPHoto" class="no-preview">No preview available.</p>
+
+      <!-- Sliders for Visual Effects -->
+      <div class="control-group group effect">
+        <div class="group-title">Effects</div>
+          <div *ngIf="previewPHoto" class="slider-controls">
+            <div class="slider">
+              <label for="brightness">Brightness</label>
+              <input
+                type="range"
+                id="brightness"
+                [(ngModel)]="brightness"
+                min="-1"
+                max="1"
+                step="0.1"
+                (input)="onEffectChange()"
+              />
+              <span>{{ brightness }}</span>
+            </div>
+
+            <div class="slider">
+              <label for="contrast">Contrast</label>
+              <input
+                type="range"
+                id="contrast"
+                [(ngModel)]="contrast"
+                min="0"
+                max="3"
+                step="0.1"
+                (input)="onEffectChange()"
+              />
+              <span>{{ contrast }}</span>
+            </div>
+
+            <div class="slider">
+              <label for="saturation">Saturation</label>
+              <input
+                type="range"
+                id="saturation"
+                [(ngModel)]="saturation"
+                min="0"
+                max="3"
+                step="0.1"
+                (input)="onEffectChange()"
+              />
+              <span>{{ saturation }}</span>
+            </div>
+          </div>
+      </div>
+
+      <button class="submit" (click)="filterImages()" [disabled]="isLoading" *ngIf="!isFilterComplete">Generate Video</button>
+
+    </div>
+
+  </div>
+
+</div>
