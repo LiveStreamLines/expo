@@ -93,7 +93,7 @@ app.use('/api/sync', syncRoutes);
 
 
 
-const PORT = 5000;
+const PORT = 9090;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Backend running on http://localhost:${PORT}`);
 });
