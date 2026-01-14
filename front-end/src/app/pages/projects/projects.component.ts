@@ -144,7 +144,14 @@ export class ProjectsComponent implements OnInit, OnChanges, AfterViewInit, OnDe
           // Use the first developer
           this.developerId = communities[0].id;
           this.selectedCategory = communities[0].name;
-          this.communityImage = communities[0].image || COMMUNITY_IMAGES[this.selectedCategory as keyof typeof COMMUNITY_IMAGES] || COMMUNITY_IMAGES['Dubai Hills Estate'] || '';
+          // Prioritize the developer's image from the API
+          this.communityImage = communities[0].image || '';
+          console.log('Developer loaded:', {
+            id: this.developerId,
+            name: this.selectedCategory,
+            image: this.communityImage,
+            fullCommunity: communities[0]
+          });
           this.loadProjects();
         } else {
           this.error = 'No developer found. Please contact your administrator.';
@@ -193,11 +200,19 @@ export class ProjectsComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       this.communitiesService.getCommunityById(this.developerId).subscribe({
         next: (community) => {
           this.selectedCategory = community.name;
-          this.communityImage = community.image || COMMUNITY_IMAGES[community.name as keyof typeof COMMUNITY_IMAGES] || COMMUNITY_IMAGES['Dubai Hills Estate'] || '';
+          // Prioritize the developer's image from the API
+          this.communityImage = community.image || '';
+          console.log('Community loaded:', {
+            id: this.developerId,
+            name: this.selectedCategory,
+            image: this.communityImage,
+            fullCommunity: community
+          });
         },
         error: (err) => {
           console.error('Error loading community name:', err);
-          this.communityImage = COMMUNITY_IMAGES[this.selectedCategory as keyof typeof COMMUNITY_IMAGES] || COMMUNITY_IMAGES['Dubai Hills Estate'] || '';
+          // Don't set a fallback image - let it show the EXPO logo
+          this.communityImage = '';
         }
       });
     }

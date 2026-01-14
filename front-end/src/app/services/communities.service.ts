@@ -27,13 +27,26 @@ export class CommunitiesService {
     return forkJoin({
       developers: this.http.get<DeveloperApiResponse[]>(this.apiUrl),
       projects: this.http.get<ProjectApiResponse[]>(this.projectsUrl).pipe(
-        catchError(() => of([])) // If projects fetch fails, use empty array
+        catchError((err) => {
+          console.error('Error fetching projects in getCommunities:', err);
+          return of([]); // If projects fetch fails, use empty array
+        }),
+        map(projects => {
+          // Ensure the response is always an array
+          if (!Array.isArray(projects)) {
+            console.warn('Projects response is not an array:', projects);
+            return [];
+          }
+          return projects;
+        })
       )
     }).pipe(
       map(({ developers, projects }) => {
         // Count projects per developer
         const projectCounts = new Map<string, number>();
-        projects.forEach(project => {
+        // Ensure projects is an array (double check)
+        const projectsArray = Array.isArray(projects) ? projects : [];
+        projectsArray.forEach(project => {
           const developerId = project.developer;
           if (developerId) {
             projectCounts.set(developerId, (projectCounts.get(developerId) || 0) + 1);
