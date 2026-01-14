@@ -571,7 +571,13 @@ export class ProjectDetailComponent implements OnInit, AfterViewInit, OnDestroy 
           }).subscribe({
             next: (results) => {
               this.communityName = results.community.name;
-              this.communityImage = results.community.image || COMMUNITY_IMAGES[results.community.name as keyof typeof COMMUNITY_IMAGES] || '';
+              // Prioritize the developer's image from the API
+              this.communityImage = results.community.image || '';
+              console.log('Project detail - Community loaded:', {
+                name: results.community.name,
+                image: this.communityImage,
+                fullCommunity: results.community
+              });
               this.developerTag = results.developer.developerTag || '';
               // If cameras are already loaded, load images now
               if (this.cameras.length > 0) {

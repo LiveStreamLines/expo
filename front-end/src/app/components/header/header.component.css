@@ -142,7 +142,8 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  width: 79px;
+  min-width: 120px;
+  max-width: 200px;
 }
 
 .user-name {
@@ -151,6 +152,9 @@
   font-family: 'Inter', sans-serif;
   color: #0d121c;
   line-height: normal;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .user-role {
@@ -159,6 +163,9 @@
   font-family: 'Inter', sans-serif;
   color: #4b5565;
   line-height: normal;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .chevron-icon {
@@ -167,10 +174,11 @@
   object-fit: contain;
   flex-shrink: 0;
   transition: transform 0.3s ease;
+  transform: rotate(180deg);
 }
 
 .chevron-icon.rotated {
-  transform: rotate(0deg);
+  transform: rotate(180deg);
 }
 
 /* Dropdown Menu */
