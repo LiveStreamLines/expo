@@ -72,6 +72,19 @@ server {
         add_header Cross-Origin-Resource-Policy "same-origin" always;
         add_header X-Content-Type-Options "nosniff" always;
     }
+
+       # Operation - Updated /v2/ location block with relaxed COEP for images
+    location /expo/ {
+        alias /var/www/expo/;
+        index index.html;
+        try_files $uri $uri/ /expo/index.html;
+
+        # Security headers
+        add_header Cross-Origin-Opener-Policy "same-origin" always;
+        add_header Cross-Origin-Embedder-Policy "require-corp" always;
+        add_header Cross-Origin-Resource-Policy "same-origin" always;
+        add_header X-Content-Type-Options "nosniff" always;
+    }
  
     # Mobile Angular app serving from /var/www/mobile
     location /mobile/ {

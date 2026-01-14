@@ -9,7 +9,10 @@ export interface LoginResponse {
   email: string;
   name: string;
   role: string;
-  authh: string; // JWT token
+  authh?: string; // JWT token
+  phoneRequired?: boolean; // Phone verification required
+  userId?: string; // User ID when phone verification is required
+  msg?: string; // Message from server
   [key: string]: any;
 }
 

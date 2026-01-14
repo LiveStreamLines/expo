@@ -1,8 +1,12 @@
 <div class="login-container">
+  <div class="login-background-logo" [style.background-image]="expoLogoUrl"></div>
   <div class="login-card">
     <div class="login-header">
-      <h1>Time Laps</h1>
-      <p>Sign in to your account</p>
+      <div class="logo-container">
+        <img src="assets/images/logos/expo-2030-logo.png" alt="EXPO 2030" class="expo-logo" />
+      </div>
+      <h1>Welcome Back</h1>
+      <p>Sign in to access your projects</p>
     </div>
 
     <form (ngSubmit)="onSubmit()" class="login-form">

@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { USER_AVATAR, NAV_ICONS } from '../../constants/figma-assets';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -11,10 +12,11 @@ import { USER_AVATAR, NAV_ICONS } from '../../constants/figma-assets';
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
+  showDropdown = false;
   currentUser = {
-    name: 'Amar Omer',
-    role: 'Client Admin',
+    name: 'User',
+    role: 'User',
     avatar: USER_AVATAR
   };
 
@@ -38,9 +40,26 @@ export class HeaderComponent implements OnInit {
     return isActive ? icon.filled : icon.outline;
   }
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    const userProfile = target.closest('.user-profile');
+    const dropdown = target.closest('.user-dropdown');
+    
+    if (!userProfile && !dropdown) {
+      this.showDropdown = false;
+    }
+  }
 
   ngOnInit() {
+    // Load user data from AuthService
+    this.loadUserData();
+
     // Update active state based on current route
     this.router.events
       .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
@@ -50,6 +69,32 @@ export class HeaderComponent implements OnInit {
 
     // Set initial active state
     this.updateActiveState(this.router.url);
+  }
+
+  ngOnDestroy() {
+    // Cleanup if needed
+  }
+
+  private loadUserData() {
+    const user = this.authService.getUser();
+    if (user) {
+      this.currentUser = {
+        name: user.name || user.email || 'User',
+        role: user.role || 'User',
+        avatar: USER_AVATAR
+      };
+    }
+  }
+
+  toggleDropdown(event: Event) {
+    event.stopPropagation();
+    this.showDropdown = !this.showDropdown;
+  }
+
+  onLogout() {
+    this.authService.logout();
+    this.showDropdown = false;
+    this.router.navigate(['/login']);
   }
 
   private updateActiveState(url: string) {

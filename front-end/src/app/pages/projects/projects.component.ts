@@ -212,11 +212,14 @@ export class ProjectsComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     this.isLoading = true;
     this.error = null;
 
+    console.log('Loading projects for developerId:', this.developerId);
+    
     forkJoin({
       projects: this.projectsService.getProjectsByDeveloperId(this.developerId),
       serviceConfig: this.serviceConfigService.getServiceConfig()
     }).subscribe({
       next: ({ projects, serviceConfig }) => {
+        console.log('Projects received:', projects);
         this.serviceConfig = serviceConfig;
         
         this.projects = projects.map(project => {
@@ -229,6 +232,7 @@ export class ProjectsComponent implements OnInit, OnChanges, AfterViewInit, OnDe
           };
         });
 
+        console.log('Processed projects:', this.projects);
         this.updateProjectServiceStatuses();
         this.loadCamerasForProjects();
         this.isLoading = false;
@@ -239,6 +243,7 @@ export class ProjectsComponent implements OnInit, OnChanges, AfterViewInit, OnDe
       },
       error: (err) => {
         console.error('Error loading projects:', err);
+        console.error('Error details:', err.error, err.status, err.statusText);
         this.error = 'Failed to load projects. Please try again later.';
         this.isLoading = false;
         this.projects = [];

@@ -15,6 +15,7 @@ import { CommonModule } from '@angular/common';
 export class AppComponent implements OnInit {
   title = 'Time Laps';
   isLoginPage = false;
+  expoLogoUrl = "url('assets/images/logos/expo-2030-logo.png')";
 
   constructor(
     private authService: AuthService,

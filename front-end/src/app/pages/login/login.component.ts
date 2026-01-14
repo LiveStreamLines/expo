@@ -17,6 +17,7 @@ export class LoginComponent implements OnInit {
   isLoading: boolean = false;
   error: string | null = null;
   showPassword: boolean = false;
+  expoLogoUrl = "url('assets/images/logos/expo-2030-logo.png')";
 
   constructor(
     private authService: AuthService,
@@ -46,19 +47,29 @@ export class LoginComponent implements OnInit {
     this.authService.login(this.email, this.password).subscribe({
       next: (response) => {
         this.isLoading = false;
+        // Check if phone verification is required
+        if (response.phoneRequired) {
+          this.error = response.msg || 'Phone verification required. Please contact your administrator.';
+          return;
+        }
+        
         if (response.authh) {
           // Login successful, redirect to projects
           this.router.navigate(['/projects']);
         } else {
-          this.error = 'Login failed: No token received';
+          this.error = 'Login failed: No authentication token received';
         }
       },
       error: (err) => {
         this.isLoading = false;
-        if (err.error && err.error.msg) {
+        if (err.status === 401) {
+          this.error = err.error?.msg || 'Invalid email or password. Please try again.';
+        } else if (err.status === 403) {
+          this.error = err.error?.msg || 'Your account is inactive. Please contact your administrator.';
+        } else if (err.error && err.error.msg) {
           this.error = err.error.msg;
         } else {
-          this.error = 'Login failed. Please check your credentials.';
+          this.error = 'Login failed. Please check your connection and try again.';
         }
         console.error('Login error:', err);
       }
